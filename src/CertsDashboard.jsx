@@ -8,15 +8,15 @@ export var CertsDashboard = React.createClass({
     return (
       <section className="dashboard">
         <CertList data={this.props.data.expiringSoon} title="Expiring Soon"
-            dateType="expiry">
+            dateType="endDate">
         </CertList>
 
         <CertList data={this.props.data.recentlyExpired} title="RecentlyExpired"
-            dateType="expiry">
+            dateType="endDate">
         </CertList>
 
         <CertList data={this.props.data.recent} title="Recent"
-            dateType="validity">
+            dateType="startDate">
         </CertList>
 
       </section>

@@ -4,8 +4,10 @@ import * as ReactDOM from 'react-dom';
 export var CertList = React.createClass({
   render() {
     let certNodes = this.props.data.map(cert => {
+      var dateString = cert[this.props.dateType].toISOString();
+
       return (
-        <li>{cert.recipient}, {cert.type}, {cert[this.props.dateType]}</li>
+        <li key={cert.id}>{cert.employee}, {cert.certificate}, {dateString}</li>
       )
     })
 
