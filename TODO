@@ -1,0 +1,4 @@
+- create / edit / delete certificate
+- integrate react-select for name
+- filter by name / cert / expiry / issued
+- proper access control

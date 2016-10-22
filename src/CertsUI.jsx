@@ -4,6 +4,8 @@ import {CertsDashboard} from './CertsDashboard.jsx';
 import {CertsForm} from './CertsForm.jsx';
 import * as firebase from 'firebase';
 import _ from 'lodash';
+import moment from 'moment';
+import events from './events';
 
 export class CertsUI extends React.Component {
   /// Firebase section
@@ -31,41 +33,31 @@ export class CertsUI extends React.Component {
     firebase.auth().onAuthStateChanged((user) => {
       this.setState({auth: {user}})
     });
-  }
 
-  async reload() {
-    // var userId = firebase.auth().currentUser.uid;
-    firebase.database().ref('certificates').once('value')
-    .then(x => {
-      let certificates = x.val()
-
-      _.forEach(certificates, (cert, key) => {
-        cert.id = key
-        cert.endDate = new Date(cert.endDate)
-        cert.startDate = new Date(cert.startDate)
-      });
-
-      let certList = _.values(certificates);
+    events.on('certificatesLoaded', (certificates) => {
       let now = Date.now();
-
       this.setState({
         certificates: certList,
         dashboardData: {
           recentlyExpired: _(certList)
-            .filter(c => c.endDate.getTime() < now)
-            .sortBy(c => -c.endDate.getTime())
+            .filter(c => c.endDate.valueOf() < now)
+            .sortBy(c => -c.endDate.valueOf())
             .value(),
           expiringSoon: _(certList)
-            .filter(c => c.endDate.getTime() > now)
-            .sortBy(c => c.endDate.getTime())
+            .filter(c => c.endDate.valueOf() >= now)
+            .sortBy(c => c.endDate.valueOf())
             .value(),
           recent: _(certList)
-            .filter(c => isFinite(c.startDate.getTime()))
-            .sortBy(c => -c.startDate.getTime())
+            .filter(c => isFinite(c.startDate.valueOf()))
+            .sortBy(c => -c.startDate.valueOf())
             .value(),
         }
       })
-    })
+    });
+  }
+
+  reload() {
+    events.emit('requestReload')
   }
 
   componentDidMount() {
@@ -76,8 +68,6 @@ export class CertsUI extends React.Component {
     let loginArea = this.state.auth.user ?
       `Logged in as ${this.state.auth.user.displayName} ${this.state.auth.user.email}` :
       <button onClick={this.login}>Login</button>;
-
-    console.log(this.state.dashboardData)
 
     return (
       <main>
