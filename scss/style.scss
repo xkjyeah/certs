@@ -87,8 +87,57 @@
     margin: 0em;
     .cert-list-entry {
       list-style-type: none;
-      padding: 0em;
+      padding: 0.3em;
       margin: 0em;
+
+      .name-cert {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0.2em 0.4em;
+        font-size: 120%;
+
+        .employee {
+          font-weight: bold;
+          flex: 1 1 auto;
+        }
+        .certificate {
+          text-align: right;
+          flex: 1 1 auto;
+        }
+      }
+      .dates {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0.2em 0.4em;
+
+        .startDate {
+          text-align: center;
+          flex: 1 1 auto;
+          &:before {
+            content: "Valid from ";
+            color: #888;
+            font-size: 80%;
+          }
+        }
+        .endDate {
+          text-align: center;
+          flex: 1 1 auto;
+          &:before {
+            content: " to ";
+            font-size: 80%;
+            color: #888;
+          }
+        }
+      }
+      .edit-button {
+        flex: 0 0 none;
+      }
+
+
 
       &:nth-child(odd) {
         background-color: #EEE;

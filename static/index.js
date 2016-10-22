@@ -32614,18 +32614,35 @@
 	          'li',
 	          { key: cert.id, className: 'cert-list-entry' },
 	          React.createElement(
-	            'strong',
-	            null,
-	            cert.employee
+	            'div',
+	            { className: 'name-cert' },
+	            React.createElement(
+	              'div',
+	              { className: 'employee' },
+	              cert.employee
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'certificate' },
+	              cert.certificate
+	            )
 	          ),
-	          ' -- ',
-	          cert.certificate,
-	          React.createElement('br', null),
-	          startDateString,
-	          ' to ',
-	          endDateString,
-	          React.createElement('button', { type: 'button', onClick: requestEdit,
-	            className: 'glyphicon glyphicon-pencil btn btn-default btn-xs' })
+	          React.createElement(
+	            'div',
+	            { className: 'dates' },
+	            React.createElement(
+	              'div',
+	              { className: 'startDate' },
+	              startDateString
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'endDate' },
+	              endDateString
+	            ),
+	            React.createElement('button', { type: 'button', onClick: requestEdit,
+	              className: 'glyphicon glyphicon-pencil btn btn-default btn-xs edit-button' })
+	          )
 	        );
 	      });
 	
@@ -69629,7 +69646,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 25px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 0.5em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
+	exports.push([module.id, ".backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 25px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 0.5em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n    .cert-list ul .cert-list-entry .edit-button {\n      flex: 0 0 none; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
 	
 	// exports
 

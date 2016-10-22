@@ -27,17 +27,26 @@ export default class CertList extends React.Component {
 
       return (
         <li key={cert.id} className="cert-list-entry">
-          <strong>{cert.employee}</strong>
-          {' -- '}
-          {cert.certificate}
-          <br/>
-          {startDateString}
-          {' to '}
-          {endDateString}
+          <div className="name-cert">
+            <div className="employee">
+              {cert.employee}
+            </div>
+            <div className="certificate">
+              {cert.certificate}
+            </div>
+          </div>
+          <div className="dates">
+            <div className="startDate">
+              {startDateString}
+            </div>
+            <div className="endDate">
+              {endDateString}
+            </div>
 
-          <button type="button" onClick={requestEdit}
-            className="glyphicon glyphicon-pencil btn btn-default btn-xs">
-          </button>
+            <button type="button" onClick={requestEdit}
+              className="glyphicon glyphicon-pencil btn btn-default btn-xs edit-button">
+            </button>
+          </div>
         </li>
       )
     })
