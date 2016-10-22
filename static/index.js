@@ -64701,6 +64701,10 @@
 	});
 	exports.CertsForm = undefined;
 	
+	var _stringify = __webpack_require__(588);
+	
+	var _stringify2 = _interopRequireDefault(_stringify);
+	
 	var _slicedToArray2 = __webpack_require__(581);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
@@ -64853,9 +64857,18 @@
 	
 	      serialized.files = _lodash2.default.keyBy(files, 'key');
 	
+	      // Maybe this sometimes fails??
+	      console.log(serialized.files);
+	      console.log(_this2.state.files);
+	      console.log(deleted, uploaded);
+	
+	      _assert2.default.strictEqual(_lodash2.default.size(serialized.files), _this2.state.files.length - deleted.length + uploaded.length);
+	
 	      console.log("BEFORE SAVE: ", serialized);
 	
 	      return firebase.database().ref('certificates/' + id).set(serialized);
+	    }).catch(function (err) {
+	      alert((0, _stringify2.default)(err));
 	    });
 	
 	    allTasksPromise.then(this.props.onSave);

@@ -93,9 +93,21 @@ export var CertsForm = React.createClass({
 
       serialized.files = _.keyBy(files, 'key')
 
+      // Maybe this sometimes fails??
+      console.log(serialized.files);
+      console.log(this.state.files);
+      console.log(deleted, uploaded);
+
+      assert.strictEqual(
+        _.size(serialized.files),
+        this.state.files.length - deleted.length + uploaded.length);
+
       console.log("BEFORE SAVE: ", serialized);
 
       return firebase.database().ref(`certificates/${id}`).set(serialized)
+    })
+    .catch((err) => {
+      alert(JSON.stringify(err));
     })
 
     allTasksPromise.then(this.props.onSave);
