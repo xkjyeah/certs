@@ -155,64 +155,73 @@ export var CertsForm = React.createClass({
     return (
       <div className={backdropClasses}>
         <form className="certs-form">
-          <input type="hidden" value={this.state.data.id} />
-          <label className="form-inline">
-            Employee
-            <MySelect
-              source="employees"
-              value={this.state.data.employee}
-              onChange={this.handleChange('employee')}
-              />
-          </label>
-          <label className="form-inline">
-            Certificate
-            <MySelect
-              source="certificates"
-              value={this.state.data.certificate}
-              onChange={this.handleChange('certificate')}
-              />
-          </label>
-          <label className="form-inline">
-            Validity
-            <DatePicker selected={this.state.data.startDate}
-              onChange={this.handleChange('startDate')}
-              />
-          </label>
-          <label className="form-inline">
-            Expiry
-            <DatePicker selected={this.state.data.endDate}
-              onChange={this.handleChange('endDate')}
-              />
-          </label>
-          <table>
-            <tbody>
-              <tr>
-                <td><button className="btn btn-default"
-                  type="button"
-                  onClick={this.adjustDate(1, 'year')}>+年</button></td>
-                <td><button className="btn btn-default"
-                  type="button"
-                  onClick={this.adjustDate(1, 'month')}>+月</button></td>
-                <td><button className="btn btn-default"
-                  type="button"
-                  onClick={this.adjustDate(1, 'day')}>+日</button></td>
-              </tr>
-              <tr>
-                <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'year')}>-年</button></td>
-                <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'month')}>-月</button></td>
-                <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'day')}>-日</button></td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="wrap-section">
+          <div className="inputs-section">
+            <input type="hidden" value={this.state.data.id} />
+            <label className="form-inline">
+              Employee
+              <MySelect
+                source="employees"
+                value={this.state.data.employee}
+                onChange={this.handleChange('employee')}
+                />
+            </label>
+            <label className="form-inline">
+              Certificate
+              <MySelect
+                source="certificates"
+                value={this.state.data.certificate}
+                onChange={this.handleChange('certificate')}
+                />
+            </label>
+            <label className="form-inline">
+              Validity
+              <DatePicker selected={this.state.data.startDate}
+                onChange={this.handleChange('startDate')}
+                />
+            </label>
+            <label className="form-inline">
+              Expiry
+              <DatePicker selected={this.state.data.endDate}
+                onChange={this.handleChange('endDate')}
+                />
+            </label>
+            <table>
+              <tbody>
+                <tr>
+                  <td><button className="btn btn-default"
+                    type="button"
+                    onClick={this.adjustDate(1, 'year')}>+年</button></td>
+                  <td><button className="btn btn-default"
+                    type="button"
+                    onClick={this.adjustDate(1, 'month')}>+月</button></td>
+                  <td><button className="btn btn-default"
+                    type="button"
+                    onClick={this.adjustDate(1, 'day')}>+日</button></td>
+                </tr>
+                <tr>
+                  <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'year')}>-年</button></td>
+                  <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'month')}>-月</button></td>
+                  <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'day')}>-日</button></td>
+                </tr>
+              </tbody>
+            </table>
 
-          Current files:
-          {/* <!-- refreshFile: force the stupid
-            input[type="file"] to reload --> */}
-          <FileList files={this.state.data.files}
-            onChange={this.filesChanged}
-            refreshFile={this.state.shown}
-            >
-          </FileList>
+          </div>
+
+          <div className="files-section">
+            Current files:
+            {/* <!-- refreshFile: force the stupid
+              input[type="file"] to reload --> */}
+            <FileList files={this.state.data.files}
+              onChange={this.filesChanged}
+              refreshFile={this.state.shown}
+              >
+            </FileList>
+          </div>
+          </div>
+
+
 
           <button type="button" onClick={this.save} className="btn btn-primary">Save</button>
           <button type="button" onClick={this.dismiss} className="btn btn-default">Cancel</button>

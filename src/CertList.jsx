@@ -2,9 +2,22 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import events from './events';
 
-export var CertList = React.createClass({
+export default class CertList extends React.Component {
+  constructor(props, context) {
+    super(props, context)
+    this.state = {
+      shown: 20
+    }
+  }
+
+  showMore() {
+    this.setState({
+      shown: this.state.shown + 20
+    })
+  }
+
   render() {
-    let certNodes = this.props.data.map(cert => {
+    let certNodes = this.props.data.slice(0, this.state.shown).map(cert => {
       var requestEdit = () => {
         events.emit('requestEdit', cert)
       }
@@ -13,7 +26,7 @@ export var CertList = React.createClass({
       var endDateString = cert.endDate && cert.endDate.format('DD MMM YYYY');
 
       return (
-        <li key={cert.id}>
+        <li key={cert.id} className="cert-list-entry">
           <strong>{cert.employee}</strong>
           {' -- '}
           {cert.certificate}
@@ -23,11 +36,16 @@ export var CertList = React.createClass({
           {endDateString}
 
           <button type="button" onClick={requestEdit}
-            className="glyphicon glyphicon-pencil button button-default">
+            className="glyphicon glyphicon-pencil btn btn-default btn-xs">
           </button>
         </li>
       )
     })
+
+    let showMore = (<button className="btn btn-link"
+        onClick={this.showMore.bind(this)}>
+        More...
+      </button>);
 
     return (
       <div className="cert-list">
@@ -35,7 +53,8 @@ export var CertList = React.createClass({
         <ul>
           {certNodes}
         </ul>
+        {(this.state.shown < this.props.data.length) ? showMore : ''}
       </div>
     )
   }
-})
+}

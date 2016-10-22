@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {CertList} from './CertList.jsx';
+import CertList from './CertList.jsx';
 
 export var CertsDashboard = React.createClass({
   render() {

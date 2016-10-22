@@ -101,14 +101,16 @@ class FileView extends React.Component {
   render() {
     return this.state.imageUrl ? (
       <span className="uploaded-image">
-        <img src={this.state.imageUrl} />
+        <a href={this.state.imageUrl} target="_blank">
+          <img src={this.state.imageUrl} alt="Loading..." />
+        </a>
         <button type="button"
           className="glyphicon glyphicon-trash btn btn-default"
           onClick={() => this.onDelete()}
           ></button>
       </span>
     ) :
-    this.imageUrl == null ? (<span>Error loading image.</span>) :
+    (this.state.imageUrl === null) ? (<span>Error loading image.</span>) :
     (<span>Loading image...</span>)
   }
 }
