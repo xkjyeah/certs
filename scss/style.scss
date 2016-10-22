@@ -5,6 +5,7 @@
   display: none;
 
   .certs-form {
+    overflow: auto;
     position: absolute;
     left: 50px;
     top: 50px;
@@ -30,5 +31,30 @@
 
   .cert-list {
     flex: 1 1 auto;
+  }
+}
+
+.file-preview {
+  img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+}
+.uploaded-image {
+  display: inline-block;
+  position: relative;
+
+  img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  button {
+    opacity: 0.5;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    &:hover {
+      opacity: 1.0;
+    }
   }
 }

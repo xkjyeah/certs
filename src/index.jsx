@@ -7,7 +7,7 @@ firebase.initializeApp({
   apiKey: "AIzaSyBhkTicoxu7KNAF-zm3mqzAZuK7UNu36QM",
   authDomain: "cert-manager-e3460.firebaseapp.com",
   databaseURL: "https://cert-manager-e3460.firebaseio.com",
-  storageBucket: "",
+  storageBucket: "gs://cert-manager-e3460.appspot.com",
   messagingSenderId: "302700696814"
 });
 

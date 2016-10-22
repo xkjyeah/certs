@@ -8,13 +8,12 @@ import moment from 'moment';
 import events from './events';
 
 export class CertsUI extends React.Component {
-  /// Firebase section
-  setupFirebase() {
-  }
-
   login() {
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithRedirect(provider)
+  }
+  logout() {
+    firebase.auth().signOut();
   }
 
   constructor(props, context) {
@@ -30,8 +29,15 @@ export class CertsUI extends React.Component {
       certificates: []
     }
 
+    this.mountedPromise = new Promise((resolve) => {
+      this._mountedPromiseResolver = resolve;
+    })
+
     firebase.auth().onAuthStateChanged((user) => {
-      this.setState({auth: {user}})
+      this.mountedPromise.then(() => {
+        this.setState({auth: {user}})
+        this.reload();
+      })
     });
   }
 
@@ -39,10 +45,14 @@ export class CertsUI extends React.Component {
     events.emit('requestReload')
   }
 
-  componentDidMount() {
-    this.reload();
+  newCertificate() {
+    events.emit('requestEdit', {})
+  }
 
-    events.on('certificatesLoaded', (certList) => {
+  componentDidMount() {
+    this._mountedPromiseResolver();
+
+    this.onCertificatesLoaded = (certList) => {
       let now = Date.now();
       this.setState({
        certificates: certList,
@@ -61,17 +71,44 @@ export class CertsUI extends React.Component {
            .value(),
        }
       })
-    });
+    };
+
+    events.on('certificatesLoaded', this.onCertificatesLoaded);
+  }
+
+  componentWillUnmount() {
+    events.removeListener('certificatesLoaded', this.onCertificatesLoaded);
   }
 
   render() {
     let loginArea = this.state.auth.user ?
-      `Logged in as ${this.state.auth.user.displayName} ${this.state.auth.user.email}` :
-      <button onClick={this.login}>Login</button>;
+      (
+        <div>
+          Logged in as
+          {' '}
+          {this.state.auth.user.displayName}
+          {' '}
+          {this.state.auth.user.email}
+          {' '}
+
+          <button onClick={this.logout}
+            className="btn btn-default glyphicon glyphicon-log-out">
+          </button>;
+        </div>
+      )
+         :
+      <button onClick={this.login}
+        className="btn btn-default glyphicon glyphicon-log-in"
+        ></button>;
 
     return (
       <main>
         {loginArea}
+
+        <button type="button" onClick={this.newCertificate}
+          className="btn btn-primary glyphicon glyphicon-plus"
+          ></button>
+
         <CertsDashboard data={this.state.dashboardData}></CertsDashboard>
         <CertsForm onSave={this.reload.bind(this)}></CertsForm>
       </main>

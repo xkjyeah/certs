@@ -14,14 +14,19 @@ export default class MySelect extends React.Component {
     }
   }
   componentDidMount() {
-    events.on('listsUpdated', (data) => {
+    this.onListsUpdated = (data) => {
       this.setState({
        options: data[this.props.source].map(s => ({
          value: s,
          label: s
        })) || []
       })
-    })
+    };
+
+    events.on('listsUpdated', this.onListsUpdated)
+  }
+  componentWillUnmount() {
+    events.removeListener('listsUpdated', this.onListsUpdated)
   }
   render() {
     let selectProps = _.omit(this.props, ['source', 'onChange']);

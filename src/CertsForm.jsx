@@ -8,6 +8,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import MySelect from './MySelect.jsx';
+import FileList from './FileList.jsx';
 import classnames from 'classnames';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -23,16 +24,24 @@ export var CertsForm = React.createClass({
         startDate: null,
         endDate: null,
       },
+      newFiles: [],
+      deletedFiles: [],
       shown: false
     }
   },
   componentDidMount() {
-    events.on('requestEdit', (certEntry) => {
+    this.requestEditListener = (certEntry) => {
       this.setState({
         data: certEntry,
-        shown: true
+        newFiles: [],
+        deletedFiles: [],
+        shown: Date.now()
       })
-    });
+    };
+    events.on('requestEdit', this.requestEditListener);
+  },
+  componentWillUnmount() {
+    events.removeListener('requestEdit', this.requestEditListener);
   },
   save(event) {
     var id = this.state.data.id || firebase.database().ref(`certificates`).push().key
@@ -47,13 +56,50 @@ export var CertsForm = React.createClass({
 
     assert(id, "ID is empty!")
 
-    let savePromise = firebase.database().ref(`certificates/${id}`)
-      .set(serialized)
+    let fileDeletePromise = Promise.all(
+      this.state.deletedFiles.map(f =>
+        firebase.storage().ref(f.storageRef).delete()
+        .then(() => f)
+      )
+    )
+
+    const newFileKeys = this.state.newFiles.map(() =>
+      firebase.database().ref(`certificates/${id}/files/`).push().key)
+
+    let fileUploadPromise = Promise.all(
+      _.zip(this.state.newFiles, newFileKeys)
+      .map(([f, key]) => {
+        let now = Date.now();
+        let storageRef = `certificates/${id}/files/${key}`;
+
+        return firebase.storage().ref(storageRef).put(f)
+          .then(() => ({
+            key,
+            storageRef,
+            createdAt: now
+          }))
+      })
+    )
 
     // console.log(serialized)
+    let allTasksPromise = Promise.all([
+      fileDeletePromise,
+      fileUploadPromise
+    ])
+    .then(([deleted, uploaded]) => {
+      let files = _.filter(this.state.files, (v) =>
+          !deleted.find(f => f.key == v.key))
+          .concat(uploaded)
 
-    savePromise.then(this.props.onSave);
-    savePromise.then(() => this.dismiss());
+      serialized.files = _.keyBy(files, 'key')
+
+      console.log("BEFORE SAVE: ", serialized);
+
+      return firebase.database().ref(`certificates/${id}`).set(serialized)
+    })
+
+    allTasksPromise.then(this.props.onSave);
+    allTasksPromise.then(() => this.dismiss());
   },
   delete(event) {
     var id = this.state.data.id;
@@ -93,6 +139,13 @@ export var CertsForm = React.createClass({
       })
     }
   },
+  filesChanged(newFiles, deletedFiles) {
+    console.log(newFiles, deletedFiles)
+    this.setState({
+      newFiles, deletedFiles
+    })
+  },
+
   render() {
     let backdropClasses = classnames({
       backdrop: true,
@@ -134,29 +187,39 @@ export var CertsForm = React.createClass({
           <table>
             <tbody>
               <tr>
-                <td><button type="button" onClick={this.adjustDate(1, 'year')}>+年</button></td>
-                <td><button type="button" onClick={this.adjustDate(1, 'month')}>+月</button></td>
-                <td><button type="button" onClick={this.adjustDate(1, 'day')}>+日</button></td>
+                <td><button className="btn btn-default"
+                  type="button"
+                  onClick={this.adjustDate(1, 'year')}>+年</button></td>
+                <td><button className="btn btn-default"
+                  type="button"
+                  onClick={this.adjustDate(1, 'month')}>+月</button></td>
+                <td><button className="btn btn-default"
+                  type="button"
+                  onClick={this.adjustDate(1, 'day')}>+日</button></td>
               </tr>
               <tr>
-                <td><button type="button" onClick={this.adjustDate(-1, 'year')}>-年</button></td>
-                <td><button type="button" onClick={this.adjustDate(-1, 'month')}>-月</button></td>
-                <td><button type="button" onClick={this.adjustDate(-1, 'day')}>-日</button></td>
+                <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'year')}>-年</button></td>
+                <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'month')}>-月</button></td>
+                <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'day')}>-日</button></td>
               </tr>
             </tbody>
           </table>
 
-          <label className="form-inline">
-            Upload files here:
-            <input type="file" multiple  />
-          </label>
+          Current files:
+          {/* <!-- refreshFile: force the stupid
+            input[type="file"] to reload --> */}
+          <FileList files={this.state.data.files}
+            onChange={this.filesChanged}
+            refreshFile={this.state.shown}
+            >
+          </FileList>
 
           <button type="button" onClick={this.save} className="btn btn-primary">Save</button>
           <button type="button" onClick={this.dismiss} className="btn btn-default">Cancel</button>
 
           <hr/>
           <button type="button" onClick={this.delete}
-            disabled={this.state.id ? false : true}
+            disabled={this.state.data.id ? false : true}
             className="btn btn-danger">Delete</button>
         </form>
       </div>

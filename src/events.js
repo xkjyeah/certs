@@ -28,6 +28,27 @@ events.on('requestReload', () => {
         return JSON.stringify(s);
       }
     }
+    function tryParseFiles(fs) {
+      if (typeof fs !== 'object') {
+        return [];
+      } else {
+        return _(fs)
+          .toPairs()
+          .filter(([key, value]) => {
+            return value &&
+              typeof value.storageRef == 'string' &&
+              typeof value.createdAt == 'number'
+          })
+          .map(([key, value]) => {
+            return {
+              storageRef: value.storageRef,
+              createdAt: value.createdAt,
+              key
+            }
+          })
+          .value()
+      }
+    }
 
     _.forEach(certificates, (cert, key) => {
       cert.id = key
@@ -35,6 +56,7 @@ events.on('requestReload', () => {
       cert.startDate = tryParseDate(cert.startDate);
       cert.employee = tryParseString(cert.employee);
       cert.certificate = tryParseString(cert.certificate);
+      cert.files = tryParseFiles(cert.files);
     });
 
     let certList = _.values(certificates);
