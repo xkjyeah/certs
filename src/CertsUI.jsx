@@ -33,27 +33,6 @@ export class CertsUI extends React.Component {
     firebase.auth().onAuthStateChanged((user) => {
       this.setState({auth: {user}})
     });
-
-    events.on('certificatesLoaded', (certificates) => {
-      let now = Date.now();
-      this.setState({
-        certificates: certList,
-        dashboardData: {
-          recentlyExpired: _(certList)
-            .filter(c => c.endDate.valueOf() < now)
-            .sortBy(c => -c.endDate.valueOf())
-            .value(),
-          expiringSoon: _(certList)
-            .filter(c => c.endDate.valueOf() >= now)
-            .sortBy(c => c.endDate.valueOf())
-            .value(),
-          recent: _(certList)
-            .filter(c => isFinite(c.startDate.valueOf()))
-            .sortBy(c => -c.startDate.valueOf())
-            .value(),
-        }
-      })
-    });
   }
 
   reload() {
@@ -62,6 +41,27 @@ export class CertsUI extends React.Component {
 
   componentDidMount() {
     this.reload();
+
+    events.on('certificatesLoaded', (certList) => {
+      let now = Date.now();
+      this.setState({
+       certificates: certList,
+       dashboardData: {
+         recentlyExpired: _(certList)
+           .filter(c => c.endDate && c.endDate.valueOf() < now)
+           .sortBy(c => c.endDate && -c.endDate.valueOf())
+           .value(),
+         expiringSoon: _(certList)
+           .filter(c => c.endDate && c.endDate.valueOf() >= now)
+           .sortBy(c => c.endDate && c.endDate.valueOf())
+           .value(),
+         recent: _(certList)
+           .filter(c => c.startDate && isFinite(c.startDate.valueOf()))
+           .sortBy(c => c.startDate && -c.startDate.valueOf())
+           .value(),
+       }
+      })
+    });
   }
 
   render() {

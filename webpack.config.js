@@ -5,7 +5,8 @@ module.exports = {
 	devtool: 'sourcemap',
 	entry: [
 		'babel-polyfill',
-		"./src/index.jsx"
+		'./src/index.jsx',
+		'./scss/style.scss'
 	],
 	output: {
 		path: path.join(__dirname, "static"),
@@ -24,7 +25,11 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				loader: 'css-loader'
+				loader: 'style-loader!css-loader'
+			},
+			{
+				test: /\.scss$/,
+				loader: 'style-loader!css-loader!sass-loader'
 			},
 			{
 				test: /\.js$/,
