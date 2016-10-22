@@ -50,16 +50,20 @@ events.on('requestReload', () => {
       }
     }
 
-    _.forEach(certificates, (cert, key) => {
-      cert.id = key
-      cert.endDate = tryParseDate(cert.endDate);
-      cert.startDate = tryParseDate(cert.startDate);
-      cert.employee = tryParseString(cert.employee);
-      cert.certificate = tryParseString(cert.certificate);
-      cert.files = tryParseFiles(cert.files);
+    var validated = _.map(certificates, (cert, key) => {
+      let {startDate, endDate, employee, certificate, files} = cert;
+
+      return {
+        id: key,
+        endDate: tryParseDate(endDate),
+        startDate: tryParseDate(startDate),
+        employee: tryParseString(employee),
+        certificate: tryParseString(certificate),
+        files: tryParseFiles(files),
+      }
     });
 
-    let certList = _.values(certificates);
+    let certList = _.values(validated);
 
     events.emit('certificatesLoaded', certList);
   });

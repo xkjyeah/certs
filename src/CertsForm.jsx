@@ -102,6 +102,9 @@ export var CertsForm = React.createClass({
     allTasksPromise.then(() => this.dismiss());
   },
   delete(event) {
+    if (!confirm("Are you sure you want to delete this certificate?")) {
+      return;
+    }
     var id = this.state.data.id;
 
     assert(id, "Cannot delete empty ID")

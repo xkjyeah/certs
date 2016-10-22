@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import events from './events';
+import firebase from 'firebase';
 
 export default class CertList extends React.Component {
   constructor(props, context) {
@@ -25,6 +26,10 @@ export default class CertList extends React.Component {
       var startDateString = cert.startDate && cert.startDate.format('DD MMM YYYY');
       var endDateString = cert.endDate && cert.endDate.format('DD MMM YYYY');
 
+      var files = cert.files.map(f =>
+        <Downloader key={f.key} storageRef={f.storageRef}></Downloader>
+      )
+
       return (
         <li key={cert.id} className="cert-list-entry">
           <div className="name-cert">
@@ -32,6 +37,9 @@ export default class CertList extends React.Component {
               {cert.employee}
             </div>
             <div className="certificate">
+              <span className="files">
+                {files}
+              </span>
               {cert.certificate}
             </div>
           </div>
@@ -64,6 +72,34 @@ export default class CertList extends React.Component {
         </ul>
         {(this.state.shown < this.props.data.length) ? showMore : ''}
       </div>
+    )
+  }
+}
+
+class Downloader extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.state = {
+      url: ''
+    }
+  }
+  // componentWillReceiveProps(props) {
+  // }
+  componentDidMount() {
+    firebase.storage().ref(this.props.storageRef).getDownloadURL()
+      .then(s => {
+        this.setState({url: s})
+      })
+    this._isMounted = true;
+  }
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+  render() {
+    return (
+      <a href={this.state.url}
+        target="_blank"
+        className="glyphicon glyphicon-file"></a>
     )
   }
 }

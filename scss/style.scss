@@ -105,6 +105,10 @@
         .certificate {
           text-align: right;
           flex: 1 1 auto;
+
+          .files {
+            font-size: 80%;
+          }
         }
       }
       .dates {
