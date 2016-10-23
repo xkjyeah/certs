@@ -83,8 +83,9 @@ export class CertsUI extends React.Component {
     let now = Date.now();
     return {
       recentlyExpired: _(certList)
-        .filter(c => c.endDate && c.endDate.valueOf() < now)
-        .sortBy(c => c.endDate && -c.endDate.valueOf())
+      /* show even those with invalid date entries */
+        .filter(c => !c.endDate || c.endDate.valueOf() < now)
+        .sortBy(c => !c.endDate || -c.endDate.valueOf())
         .value(),
       expiringSoon: _(certList)
         .filter(c => c.endDate && c.endDate.valueOf() >= now)
