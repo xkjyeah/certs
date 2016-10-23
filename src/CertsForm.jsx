@@ -87,7 +87,7 @@ export var CertsForm = React.createClass({
       fileUploadPromise
     ])
     .then(([deleted, uploaded]) => {
-      let files = _.filter(this.state.files, (v) =>
+      let files = _.filter(this.state.data.files, (v) =>
           !deleted.find(f => f.key == v.key))
           .concat(uploaded)
 
@@ -95,12 +95,12 @@ export var CertsForm = React.createClass({
 
       // Maybe this sometimes fails??
       console.log(serialized.files);
-      console.log(this.state.files);
+      console.log(this.state.data.files);
       console.log(deleted, uploaded);
 
       assert.strictEqual(
         _.size(serialized.files),
-        this.state.files.length - deleted.length + uploaded.length);
+        this.state.data.files.length - deleted.length + uploaded.length);
 
       console.log("BEFORE SAVE: ", serialized);
 

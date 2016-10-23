@@ -64849,7 +64849,7 @@
 	      var deleted = _ref4[0];
 	      var uploaded = _ref4[1];
 	
-	      var files = _lodash2.default.filter(_this2.state.files, function (v) {
+	      var files = _lodash2.default.filter(_this2.state.data.files, function (v) {
 	        return !deleted.find(function (f) {
 	          return f.key == v.key;
 	        });
@@ -64859,10 +64859,10 @@
 	
 	      // Maybe this sometimes fails??
 	      console.log(serialized.files);
-	      console.log(_this2.state.files);
+	      console.log(_this2.state.data.files);
 	      console.log(deleted, uploaded);
 	
-	      _assert2.default.strictEqual(_lodash2.default.size(serialized.files), _this2.state.files.length - deleted.length + uploaded.length);
+	      _assert2.default.strictEqual(_lodash2.default.size(serialized.files), _this2.state.data.files.length - deleted.length + uploaded.length);
 	
 	      console.log("BEFORE SAVE: ", serialized);
 	
