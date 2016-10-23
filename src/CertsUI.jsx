@@ -135,18 +135,22 @@ export class CertsUI extends React.Component {
 
         <div className="filter-area">
           <label>
-            <MySelect source="employees"
-              value={this.state.filter.employee}
-              placeholder="Search by Employee name..."
-              onChange={debounced((e) => this.updateFilter('employee', e))}
-              />
+            <input
+                className="form-control"
+                value={this.state.filter.employee}
+                onChange={debounced((e) => this.updateFilter('employee', e.target.value))}
+                placeholder="Search by Employee name..."
+                type="text"
+                />
           </label>
           <label className="certificates-filter">
-            <MySelect source="certificates"
-              value={this.state.filter.certificate}
-              placeholder="Search by Certificate type..."
-              onChange={debounced((e) => this.updateFilter('certificate', e))}
-              />
+            <input
+              className="form-control"
+                value={this.state.filter.certificate}
+                onChange={debounced((e) => this.updateFilter('certificate', e.target.value))}
+                placeholder="Search by Certificate..."
+                type="text"
+                />
           </label>
           <button type="button" onClick={this.newCertificate}
             className="btn btn-primary glyphicon glyphicon-plus"
