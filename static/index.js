@@ -32710,10 +32710,12 @@
 	    value: function componentDidMount() {
 	      var _this3 = this;
 	
-	      _firebase2.default.storage().ref(this.props.storageRef).getDownloadURL().then(function (s) {
-	        _this3.setState({ url: s });
-	      });
 	      this._isMounted = true;
+	      _firebase2.default.storage().ref(this.props.storageRef).getDownloadURL().then(function (s) {
+	        if (_this3._isMounted) {
+	          _this3.setState({ url: s });
+	        }
+	      });
 	    }
 	  }, {
 	    key: 'componentWillUnmount',

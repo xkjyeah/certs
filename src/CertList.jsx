@@ -86,11 +86,13 @@ class Downloader extends React.Component {
   // componentWillReceiveProps(props) {
   // }
   componentDidMount() {
+    this._isMounted = true;
     firebase.storage().ref(this.props.storageRef).getDownloadURL()
       .then(s => {
-        this.setState({url: s})
+        if (this._isMounted) {
+          this.setState({url: s})
+        }
       })
-    this._isMounted = true;
   }
   componentWillUnmount() {
     this._isMounted = false;
