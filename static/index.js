@@ -8882,6 +8882,10 @@
 	
 	var _CertsForm = __webpack_require__(699);
 	
+	var _MySelect = __webpack_require__(710);
+	
+	var _MySelect2 = _interopRequireDefault(_MySelect);
+	
 	var _firebase = __webpack_require__(299);
 	
 	var firebase = _interopRequireWildcard(_firebase);
@@ -8992,10 +8996,12 @@
 	    value: function _dashboardData(certList) {
 	      var now = Date.now();
 	      return {
-	        recentlyExpired: (0, _lodash2.default)(certList).filter(function (c) {
-	          return c.endDate && c.endDate.valueOf() < now;
+	        recentlyExpired: (0, _lodash2.default)(certList)
+	        /* show even those with invalid date entries */
+	        .filter(function (c) {
+	          return !c.endDate || c.endDate.valueOf() < now;
 	        }).sortBy(function (c) {
-	          return c.endDate && -c.endDate.valueOf();
+	          return !c.endDate || -c.endDate.valueOf();
 	        }).value(),
 	        expiringSoon: (0, _lodash2.default)(certList).filter(function (c) {
 	          return c.endDate && c.endDate.valueOf() >= now;
@@ -9015,7 +9021,7 @@
 	      var _this3 = this;
 	
 	      return certList.filter(function (c) {
-	        return !_this3.state.filter.employee || c.employee.toUpperCase().indexOf(_this3.state.filter.employee.toUpperCase()) >= 0;
+	        return (!_this3.state.filter.employee || c.employee.toUpperCase().indexOf(_this3.state.filter.employee.toUpperCase()) >= 0) && (!_this3.state.filter.certificate || c.certificate.toUpperCase().indexOf(_this3.state.filter.certificate.toUpperCase()) >= 0);
 	      });
 	    }
 	  }, {
@@ -9047,16 +9053,31 @@
 	        loginArea,
 	        React.createElement(
 	          'div',
-	          null,
+	          { className: 'filter-area' },
 	          React.createElement(
 	            'label',
 	            null,
-	            React.createElement('input', { type: 'text',
+	            React.createElement('input', {
+	              className: 'form-control',
 	              value: this.state.filter.employee,
-	              placeholder: 'Search for employee...',
 	              onChange: debounced(function (e) {
 	                return _this4.updateFilter('employee', e.target.value);
-	              })
+	              }),
+	              placeholder: 'Search by Employee name...',
+	              type: 'text'
+	            })
+	          ),
+	          React.createElement(
+	            'label',
+	            { className: 'certificates-filter' },
+	            React.createElement('input', {
+	              className: 'form-control',
+	              value: this.state.filter.certificate,
+	              onChange: debounced(function (e) {
+	                return _this4.updateFilter('certificate', e.target.value);
+	              }),
+	              placeholder: 'Search by Certificate...',
+	              type: 'text'
 	            })
 	          ),
 	          React.createElement('button', { type: 'button', onClick: this.newCertificate,
@@ -32781,8 +32802,6 @@
 	events.on('requestReload', function () {
 	  _firebase2.default.database().ref('certificates').once('value').then(function (x) {
 	    var certificates = x.val();
-	
-	    window.XXX = certificates;
 	
 	    function tryParseDate(dt) {
 	      var m = null;
@@ -64859,14 +64878,7 @@
 	
 	      serialized.files = _lodash2.default.keyBy(files, 'key');
 	
-	      // Maybe this sometimes fails??
-	      console.log(serialized.files);
-	      console.log(_this2.state.data.files);
-	      console.log(deleted, uploaded);
-	
-	      _assert2.default.strictEqual(_lodash2.default.size(serialized.files), _this2.state.data.files.length - deleted.length + uploaded.length);
-	
-	      console.log("BEFORE SAVE: ", serialized);
+	      _assert2.default.strictEqual(_lodash2.default.size(serialized.files), _this2.state.data.files.length - deleted.length + uploaded.length, "Number of files don't match. Data may be lost");
 	
 	      return firebase.database().ref('certificates/' + id).set(serialized);
 	    }).catch(function (err) {
@@ -69731,7 +69743,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 25px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 0.5em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n    .cert-list ul .cert-list-entry .edit-button {\n      flex: 0 0 none; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
+	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 25px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 0.5em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n    .cert-list ul .cert-list-entry .edit-button {\n      flex: 0 0 none; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
 	
 	// exports
 
