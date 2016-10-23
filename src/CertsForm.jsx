@@ -93,16 +93,10 @@ export var CertsForm = React.createClass({
 
       serialized.files = _.keyBy(files, 'key')
 
-      // Maybe this sometimes fails??
-      console.log(serialized.files);
-      console.log(this.state.data.files);
-      console.log(deleted, uploaded);
-
       assert.strictEqual(
         _.size(serialized.files),
-        this.state.data.files.length - deleted.length + uploaded.length);
-
-      console.log("BEFORE SAVE: ", serialized);
+        this.state.data.files.length - deleted.length + uploaded.length,
+        "Number of files don't match. Data may be lost");
 
       return firebase.database().ref(`certificates/${id}`).set(serialized)
     })
