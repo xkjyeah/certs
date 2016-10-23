@@ -18,7 +18,7 @@
     bottom: 50px;
     right: 50px;
     background: white;
-    padding: 25px;
+    padding: 0px;
 
     .wrap-section {
       display: flex;
@@ -26,7 +26,7 @@
       flex-wrap: wrap;
 
       .files-section, .inputs-section {
-        padding: 0.5em;
+        padding: 1em;
       }
       .files-section {
         flex: 1 0 300px;

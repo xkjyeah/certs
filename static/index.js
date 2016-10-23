@@ -64951,157 +64951,178 @@
 	      'div',
 	      { className: backdropClasses },
 	      React.createElement(
-	        'form',
+	        'div',
 	        { className: 'certs-form' },
+	        ' ',
 	        React.createElement(
 	          'div',
-	          { className: 'wrap-section' },
+	          { className: 'modal-header' },
+	          React.createElement('button', { type: 'button', onClick: this.dismiss,
+	            className: 'glyphicon glyphicon-remove close' }),
+	          React.createElement(
+	            'h4',
+	            null,
+	            'Edit Certificate'
+	          )
+	        ),
+	        React.createElement(
+	          'form',
+	          { className: 'modal-body' },
 	          React.createElement(
 	            'div',
-	            { className: 'inputs-section' },
-	            React.createElement('input', { type: 'hidden', value: this.state.data.id }),
+	            { className: 'wrap-section' },
 	            React.createElement(
-	              'label',
-	              { className: 'form-inline' },
-	              'Employee',
-	              React.createElement(_MySelect2.default, {
-	                source: 'employees',
-	                value: this.state.data.employee,
-	                onChange: this.handleChange('employee')
-	              })
-	            ),
-	            React.createElement(
-	              'label',
-	              { className: 'form-inline' },
-	              'Certificate',
-	              React.createElement(_MySelect2.default, {
-	                source: 'certificates',
-	                value: this.state.data.certificate,
-	                onChange: this.handleChange('certificate')
-	              })
-	            ),
-	            React.createElement(
-	              'label',
-	              { className: 'form-inline' },
-	              'Validity',
-	              React.createElement(_reactDatepicker2.default, { selected: this.state.data.startDate,
-	                onChange: this.handleChange('startDate')
-	              })
-	            ),
-	            React.createElement(
-	              'label',
-	              { className: 'form-inline' },
-	              'Expiry',
-	              React.createElement(_reactDatepicker2.default, { selected: this.state.data.endDate,
-	                onChange: this.handleChange('endDate')
-	              })
-	            ),
-	            React.createElement(
-	              'table',
-	              null,
+	              'div',
+	              { className: 'inputs-section' },
+	              React.createElement('input', { type: 'hidden', value: this.state.data.id }),
 	              React.createElement(
-	                'tbody',
+	                'label',
+	                { className: 'form-inline' },
+	                'Employee',
+	                React.createElement(_MySelect2.default, {
+	                  source: 'employees',
+	                  value: this.state.data.employee,
+	                  onChange: this.handleChange('employee')
+	                })
+	              ),
+	              React.createElement(
+	                'label',
+	                { className: 'form-inline' },
+	                'Certificate',
+	                React.createElement(_MySelect2.default, {
+	                  source: 'certificates',
+	                  value: this.state.data.certificate,
+	                  onChange: this.handleChange('certificate')
+	                })
+	              ),
+	              React.createElement(
+	                'label',
+	                { className: 'form-inline' },
+	                'Validity',
+	                React.createElement(_reactDatepicker2.default, { selected: this.state.data.startDate,
+	                  onChange: this.handleChange('startDate')
+	                })
+	              ),
+	              React.createElement(
+	                'label',
+	                { className: 'form-inline' },
+	                'Expiry',
+	                React.createElement(_reactDatepicker2.default, { selected: this.state.data.endDate,
+	                  onChange: this.handleChange('endDate')
+	                })
+	              ),
+	              React.createElement(
+	                'table',
 	                null,
 	                React.createElement(
-	                  'tr',
+	                  'tbody',
 	                  null,
 	                  React.createElement(
-	                    'td',
+	                    'tr',
 	                    null,
 	                    React.createElement(
-	                      'button',
-	                      { className: 'btn btn-default',
-	                        type: 'button',
-	                        onClick: this.adjustDate(1, 'year') },
-	                      '+\u5E74'
+	                      'td',
+	                      null,
+	                      React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default',
+	                          type: 'button',
+	                          onClick: this.adjustDate(1, 'year') },
+	                        '+\u5E74'
+	                      )
+	                    ),
+	                    React.createElement(
+	                      'td',
+	                      null,
+	                      React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default',
+	                          type: 'button',
+	                          onClick: this.adjustDate(1, 'month') },
+	                        '+\u6708'
+	                      )
+	                    ),
+	                    React.createElement(
+	                      'td',
+	                      null,
+	                      React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default',
+	                          type: 'button',
+	                          onClick: this.adjustDate(1, 'day') },
+	                        '+\u65E5'
+	                      )
 	                    )
 	                  ),
 	                  React.createElement(
-	                    'td',
+	                    'tr',
 	                    null,
 	                    React.createElement(
-	                      'button',
-	                      { className: 'btn btn-default',
-	                        type: 'button',
-	                        onClick: this.adjustDate(1, 'month') },
-	                      '+\u6708'
-	                    )
-	                  ),
-	                  React.createElement(
-	                    'td',
-	                    null,
+	                      'td',
+	                      null,
+	                      React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default', type: 'button', onClick: this.adjustDate(-1, 'year') },
+	                        '-\u5E74'
+	                      )
+	                    ),
 	                    React.createElement(
-	                      'button',
-	                      { className: 'btn btn-default',
-	                        type: 'button',
-	                        onClick: this.adjustDate(1, 'day') },
-	                      '+\u65E5'
-	                    )
-	                  )
-	                ),
-	                React.createElement(
-	                  'tr',
-	                  null,
-	                  React.createElement(
-	                    'td',
-	                    null,
+	                      'td',
+	                      null,
+	                      React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default', type: 'button', onClick: this.adjustDate(-1, 'month') },
+	                        '-\u6708'
+	                      )
+	                    ),
 	                    React.createElement(
-	                      'button',
-	                      { className: 'btn btn-default', type: 'button', onClick: this.adjustDate(-1, 'year') },
-	                      '-\u5E74'
-	                    )
-	                  ),
-	                  React.createElement(
-	                    'td',
-	                    null,
-	                    React.createElement(
-	                      'button',
-	                      { className: 'btn btn-default', type: 'button', onClick: this.adjustDate(-1, 'month') },
-	                      '-\u6708'
-	                    )
-	                  ),
-	                  React.createElement(
-	                    'td',
-	                    null,
-	                    React.createElement(
-	                      'button',
-	                      { className: 'btn btn-default', type: 'button', onClick: this.adjustDate(-1, 'day') },
-	                      '-\u65E5'
+	                      'td',
+	                      null,
+	                      React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default', type: 'button', onClick: this.adjustDate(-1, 'day') },
+	                        '-\u65E5'
+	                      )
 	                    )
 	                  )
 	                )
 	              )
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'files-section' },
+	              'Current files:',
+	              React.createElement(_FileList2.default, { files: this.state.data.files,
+	                onChange: this.filesChanged,
+	                refreshFile: this.state.shown
+	              })
 	            )
-	          ),
-	          React.createElement(
-	            'div',
-	            { className: 'files-section' },
-	            'Current files:',
-	            React.createElement(_FileList2.default, { files: this.state.data.files,
-	              onChange: this.filesChanged,
-	              refreshFile: this.state.shown
-	            })
 	          )
 	        ),
 	        React.createElement(
-	          'button',
-	          { type: 'button', onClick: this.save, className: 'btn btn-primary' },
-	          'Save'
-	        ),
-	        React.createElement(
-	          'button',
-	          { type: 'button', onClick: this.dismiss, className: 'btn btn-default' },
-	          'Cancel'
-	        ),
-	        React.createElement('hr', null),
-	        React.createElement(
-	          'button',
-	          { type: 'button', onClick: this.delete,
-	            disabled: this.state.data.id ? false : true,
-	            className: 'btn btn-danger' },
-	          'Delete'
+	          'div',
+	          { className: 'modal-footer' },
+	          React.createElement(
+	            'button',
+	            { type: 'button', onClick: this.save, className: 'btn btn-primary' },
+	            'Save'
+	          ),
+	          React.createElement(
+	            'button',
+	            { type: 'button', onClick: this.dismiss, className: 'btn btn-default' },
+	            'Cancel'
+	          ),
+	          React.createElement('hr', null),
+	          React.createElement(
+	            'button',
+	            { type: 'button', onClick: this.delete,
+	              disabled: this.state.data.id ? false : true,
+	              className: 'btn btn-danger' },
+	            'Delete'
+	          )
 	        )
-	      )
+	      ),
+	      ' '
 	    );
 	  }
 	});
@@ -69743,7 +69764,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 25px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 0.5em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n    .cert-list ul .cert-list-entry .edit-button {\n      flex: 0 0 none; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
+	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 0px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 1em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n    .cert-list ul .cert-list-entry .edit-button {\n      flex: 0 0 none; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
 	
 	// exports
 
