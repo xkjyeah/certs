@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {CertsDashboard} from './CertsDashboard.jsx';
 import {CertsForm} from './CertsForm.jsx';
+import MySelect from './MySelect.jsx';
 import * as firebase from 'firebase';
 import _ from 'lodash';
 import moment from 'moment';
@@ -99,7 +100,9 @@ export class CertsUI extends React.Component {
   _filter(certList) {
     return certList.filter(c =>
       (!this.state.filter.employee ||
-        c.employee.toUpperCase().indexOf(this.state.filter.employee.toUpperCase()) >= 0)
+        c.employee.toUpperCase().indexOf(this.state.filter.employee.toUpperCase()) >= 0) &&
+      (!this.state.filter.certificate ||
+        c.certificate.toUpperCase().indexOf(this.state.filter.certificate.toUpperCase()) >= 0)
     )
   }
 
@@ -130,12 +133,19 @@ export class CertsUI extends React.Component {
       <main>
         {loginArea}
 
-        <div>
+        <div className="filter-area">
           <label>
-            <input type="text"
+            <MySelect source="employees"
               value={this.state.filter.employee}
-              placeholder="Search for employee..."
-              onChange={debounced((e) => this.updateFilter('employee', e.target.value))}
+              placeholder="Search by Employee name..."
+              onChange={debounced((e) => this.updateFilter('employee', e))}
+              />
+          </label>
+          <label className="certificates-filter">
+            <MySelect source="certificates"
+              value={this.state.filter.certificate}
+              placeholder="Search by Certificate type..."
+              onChange={debounced((e) => this.updateFilter('certificate', e))}
               />
           </label>
           <button type="button" onClick={this.newCertificate}
