@@ -52,7 +52,9 @@ export class CertsUI extends React.Component {
   }
 
   newCertificate() {
-    events.emit('requestEdit', {})
+    events.emit('requestEdit', {
+        files: []
+    })
   }
 
   componentDidMount() {
