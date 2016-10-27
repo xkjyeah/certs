@@ -88,6 +88,10 @@ export var CertsForm = React.createClass({
       issuer: this.state.data.issuer,
       startDate: this.state.data.startDate.format(),
       endDate: this.state.data.endDate && this.state.data.endDate.format(),
+      createdAt: (this.state.data.createdAt && this.state.data.createdAt.format()) || moment().format(),
+      updatedAt: moment().format(),
+      createdBy: this.state.data.createdBy || firebase.auth().currentUser.email,
+      updatedBy: firebase.auth().currentUser.email,
     };
 
     assert(id, "ID is empty!")

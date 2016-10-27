@@ -56,7 +56,14 @@ export default class CertList extends React.Component {
             </button>
           </div>
           <div className="remarks">
-            <span className="label">Issued by:</span> {cert.issuer || ''}
+            <span className="label">Issued by:</span> {cert.issuer || ''}<br/>
+            <span className="label secondary">Created by: {cert.createdBy || ''}
+              at {cert.createdAt && cert.createdAt.format('DD-MM-YYYY HH:mm:ss')}
+            </span>
+            <br/>
+            <span className="label secondary">Updated by: {cert.updatedBy || ''}
+              at {cert.updatedAt && cert.updatedAt.format('DD-MM-YYYY HH:mm:ss')}
+            </span><br/>
           </div>
         </li>
       )

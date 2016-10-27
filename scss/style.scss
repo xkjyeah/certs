@@ -154,6 +154,10 @@
       .remarks {
         .label {
           color: #888;
+          &.secondary {
+            opacity: 0.0;
+            font-weight: normal;
+          }
         }
       }
 
@@ -165,6 +169,12 @@
       }
       &:hover {
         background-color: #ABF;
+
+        .remarks {
+          .label.secondary {
+              opacity: 0.8;
+          }
+        }
       }
     }
   }

@@ -52,12 +52,17 @@ events.on('requestReload', () => {
 
     var validated = _.map(certificates, (cert, key) => {
       let {startDate, endDate, employee, certificate,
-          files, issuer} = cert;
+          files, issuer, createdAt, updatedAt,
+          createdBy, updatedBy} = cert;
 
       return {
         id: key,
         endDate: tryParseDate(endDate),
         startDate: tryParseDate(startDate),
+        createdAt: tryParseDate(createdAt),
+        updatedAt: tryParseDate(updatedAt),
+        createdBy: tryParseString(createdBy),
+        updatedBy: tryParseString(updatedBy),
         employee: tryParseString(employee),
         issuer: tryParseString(issuer),
         certificate: tryParseString(certificate),
