@@ -24,6 +24,7 @@ export var CertsForm = React.createClass({
         startDate: null,
         endDate: null,
       },
+      validationErrors: {},
       newFiles: [],
       deletedFiles: [],
       shown: false
@@ -45,6 +46,15 @@ export var CertsForm = React.createClass({
   },
   save(event) {
     var id = this.state.data.id || firebase.database().ref(`certificates`).push().key
+
+    // HACK: validation messages:
+    this.setState({
+      validationErrors: {
+        employee: [!!this.state.data.employee, "Employee name is required"],
+        certificate: [!!this.state.data.certificate, "Certificate type is required"],
+        startDate: [!!this.state.data.startDate, "Start date is required"],
+      }
+    })
 
     var serialized = {
       id,
@@ -161,6 +171,21 @@ export var CertsForm = React.createClass({
       show: this.state.shown
     })
 
+    function validationMessage(which) {
+      if (this.state.validationErrors[which] &&
+        !this.state.validationErrors[which][0]
+      ) {
+        return (
+          <span class="validation-error">
+            {this.state.validationErrors[which][1]}
+          </span>
+        )
+      }
+      else {
+        return '';
+      }
+    }
+
     return (
       <div className={backdropClasses}>
         <div className="certs-form"> {/* modal dialog */}
@@ -184,6 +209,7 @@ export var CertsForm = React.createClass({
                     value={this.state.data.employee}
                     onChange={this.handleChange('employee')}
                     />
+                  {validationMessage('employee')}
                 </label>
                 <label className="form-inline">
                   Certificate
@@ -192,18 +218,21 @@ export var CertsForm = React.createClass({
                     value={this.state.data.certificate}
                     onChange={this.handleChange('certificate')}
                     />
+                  {validationMessage('certificate')}
                 </label>
                 <label className="form-inline">
                   Validity
                   <DatePicker selected={this.state.data.startDate}
                     onChange={this.handleChange('startDate')}
                     />
+                  {validationMessage('startDate')}
                 </label>
                 <label className="form-inline">
                   Expiry
                   <DatePicker selected={this.state.data.endDate}
                     onChange={this.handleChange('endDate')}
                     />
+                  {validationMessage('endDate')}
                 </label>
                 <table>
                   <tbody>
