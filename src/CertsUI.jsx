@@ -2,7 +2,9 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {CertsDashboard} from './CertsDashboard.jsx';
 import {CertsForm} from './CertsForm.jsx';
+import {CertsTable} from './CertsTable.jsx';
 import MySelect from './MySelect.jsx';
+import DatePicker from 'react-datepicker';
 import * as firebase from 'firebase';
 import _ from 'lodash';
 import moment from 'moment';
@@ -29,7 +31,10 @@ export class CertsUI extends React.Component {
         recent: []
       },
       filter: {
-        employee: ''
+        employee: '',
+        expired: true,
+        valid: true,
+        referenceDate: moment()
       },
       auth: {user: null},
       certificates: []
@@ -108,11 +113,20 @@ export class CertsUI extends React.Component {
   }
 
   _filter(certList) {
+    let now = this.state.filter.referenceDate || moment();
     return certList.filter(c =>
       (!this.state.filter.employee ||
         c.employee.toUpperCase().indexOf(this.state.filter.employee.toUpperCase()) >= 0) &&
       (!this.state.filter.certificate ||
-        c.certificate.toUpperCase().indexOf(this.state.filter.certificate.toUpperCase()) >= 0)
+        c.certificate.toUpperCase().indexOf(this.state.filter.certificate.toUpperCase()) >= 0) &&
+      (
+        (this.state.filter.expired &&
+          c.endDate && c.endDate.valueOf() < now
+        ) ||
+        (this.state.filter.valid &&
+          (!c.endDate || c.endDate.valueOf() >= now)
+        )
+      )
     )
   }
 
@@ -162,12 +176,40 @@ export class CertsUI extends React.Component {
                 type="text"
                 />
           </label>
-          <button type="button" onClick={this.newCertificate.bind(this)}
-            className="btn btn-primary glyphicon glyphicon-plus"
-            ></button>
-        </div>
+          <label className="certificates-filter">
+            <input
+                checked={this.state.filter.valid}
+                onChange={(e) => this.updateFilter('valid', e.target.checked)}
+                type="checkbox"
+                />
+              Valid on
+          </label>
+          <label className="certificates-filter">
+            <input
+                checked={this.state.filter.expired}
+                onChange={(e) => this.updateFilter('expired', e.target.checked)}
+                type="checkbox"
+                />
+              Expired on
+          </label>
 
-        <CertsDashboard data={dashboardData}></CertsDashboard>
+          <label className="form-inline">
+            Reference date:
+            <DatePicker
+              selected={this.state.filter.referenceDate}
+              onChange={e => this.updateFilter('referenceDate', e)}
+              />
+          </label>
+
+          <button type="button" onClick={this.newCertificate.bind(this)}
+            className="btn btn-primary"
+            >
+            <i className=" glyphicon glyphicon-plus"></i>
+            Add certificate
+          </button>
+        </div>
+        <CertsTable certs={filteredCerts}></CertsTable>
+        {/*<CertsDashboard data={dashboardData}></CertsDashboard> */}
         <CertsForm onSave={this.reload.bind(this)}></CertsForm>
       </main>
     )
