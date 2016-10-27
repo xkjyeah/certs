@@ -45,18 +45,38 @@ export var CertsForm = React.createClass({
   componentWillUnmount() {
     events.removeListener('requestEdit', this.requestEditListener);
   },
+  validate() {
+    let validationErrors = {
+      employee: [!!this.state.data.employee, "Employee name is required"],
+      certificate: [!!this.state.data.certificate, "Certificate type is required"],
+      issuer: [!!this.state.data.issuer, "Issuer is required"],
+      startDate: [!!this.state.data.startDate, "Start date is required"],
+    };
+
+    let validates = _(validationErrors)
+      .every((v, k) => v[0])
+
+    if (validates) {
+      return true;
+    } else {
+      this.setState({
+        validationErrors: {
+          employee: [!!this.state.data.employee, "Employee name is required"],
+          certificate: [!!this.state.data.certificate, "Certificate type is required"],
+          issuer: [!!this.state.data.issuer, "Issuer is required"],
+          startDate: [!!this.state.data.startDate, "Start date is required"],
+        }
+      })
+      return false;
+    }
+  },
   save(event) {
     var id = this.state.data.id || firebase.database().ref(`certificates`).push().key
 
     // HACK: validation messages:
-    this.setState({
-      validationErrors: {
-        employee: [!!this.state.data.employee, "Employee name is required"],
-        certificate: [!!this.state.data.certificate, "Certificate type is required"],
-        issuer: [!!this.state.data.issuer, "Issuer is required"],
-        startDate: [!!this.state.data.startDate, "Start date is required"],
-      }
-    })
+    if (!this.validate()) {
+      return;
+    }
 
     /* The data that will be saved in the database, before
       the file data has been included
@@ -118,10 +138,11 @@ export var CertsForm = React.createClass({
     })
     .catch((err) => {
       alert(JSON.stringify(err));
+      throw err;
     })
 
-    allTasksPromise.then(this.props.onSave);
-    allTasksPromise.then(() => this.dismiss());
+    allTasksPromise.then(this.props.onSave)
+    .then(() => this.dismiss());
   },
   delete(event) {
     if (!confirm("Are you sure you want to delete this certificate?")) {

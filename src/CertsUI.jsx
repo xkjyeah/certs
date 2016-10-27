@@ -54,6 +54,8 @@ export class CertsUI extends React.Component {
   newCertificate() {
     events.emit('requestEdit', {
       employee: this.state.filter.employee,
+      startDate: null,
+      endDate: null,
       files: []
     })
   }

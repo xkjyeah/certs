@@ -8964,6 +8964,8 @@
 	    value: function newCertificate() {
 	      _events2.default.emit('requestEdit', {
 	        employee: this.state.filter.employee,
+	        startDate: null,
+	        endDate: null,
 	        files: []
 	      });
 	    }
@@ -64841,20 +64843,41 @@
 	  componentWillUnmount: function componentWillUnmount() {
 	    _events2.default.removeListener('requestEdit', this.requestEditListener);
 	  },
+	  validate: function validate() {
+	    var validationErrors = {
+	      employee: [!!this.state.data.employee, "Employee name is required"],
+	      certificate: [!!this.state.data.certificate, "Certificate type is required"],
+	      issuer: [!!this.state.data.issuer, "Issuer is required"],
+	      startDate: [!!this.state.data.startDate, "Start date is required"]
+	    };
+	
+	    var validates = (0, _lodash2.default)(validationErrors).every(function (v, k) {
+	      return v[0];
+	    });
+	
+	    if (validates) {
+	      return true;
+	    } else {
+	      this.setState({
+	        validationErrors: {
+	          employee: [!!this.state.data.employee, "Employee name is required"],
+	          certificate: [!!this.state.data.certificate, "Certificate type is required"],
+	          issuer: [!!this.state.data.issuer, "Issuer is required"],
+	          startDate: [!!this.state.data.startDate, "Start date is required"]
+	        }
+	      });
+	      return false;
+	    }
+	  },
 	  save: function save(event) {
 	    var _this2 = this;
 	
 	    var id = this.state.data.id || firebase.database().ref('certificates').push().key;
 	
 	    // HACK: validation messages:
-	    this.setState({
-	      validationErrors: {
-	        employee: [!!this.state.data.employee, "Employee name is required"],
-	        certificate: [!!this.state.data.certificate, "Certificate type is required"],
-	        issuer: [!!this.state.data.issuer, "Issuer is required"],
-	        startDate: [!!this.state.data.startDate, "Start date is required"]
-	      }
-	    });
+	    if (!this.validate()) {
+	      return;
+	    }
 	
 	    /* The data that will be saved in the database, before
 	      the file data has been included
@@ -64918,10 +64941,10 @@
 	      return firebase.database().ref('certificates/' + id).set(serialized);
 	    }).catch(function (err) {
 	      alert((0, _stringify2.default)(err));
+	      throw err;
 	    });
 	
-	    allTasksPromise.then(this.props.onSave);
-	    allTasksPromise.then(function () {
+	    allTasksPromise.then(this.props.onSave).then(function () {
 	      return _this2.dismiss();
 	    });
 	  },
