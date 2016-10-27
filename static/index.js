@@ -8962,7 +8962,9 @@
 	  }, {
 	    key: 'newCertificate',
 	    value: function newCertificate() {
-	      _events2.default.emit('requestEdit', {});
+	      _events2.default.emit('requestEdit', {
+	        files: []
+	      });
 	    }
 	  }, {
 	    key: 'componentDidMount',
