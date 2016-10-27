@@ -53,7 +53,8 @@ export class CertsUI extends React.Component {
 
   newCertificate() {
     events.emit('requestEdit', {
-        files: []
+      employee: this.state.filter.employee,
+      files: []
     })
   }
 
