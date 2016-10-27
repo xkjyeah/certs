@@ -21,6 +21,7 @@ export var CertsForm = React.createClass({
         id: '',
         employee: '',
         certificate: '',
+        issuer: '',
         startDate: null,
         endDate: null,
       },
@@ -52,14 +53,19 @@ export var CertsForm = React.createClass({
       validationErrors: {
         employee: [!!this.state.data.employee, "Employee name is required"],
         certificate: [!!this.state.data.certificate, "Certificate type is required"],
+        issuer: [!!this.state.data.issuer, "Issuer is required"],
         startDate: [!!this.state.data.startDate, "Start date is required"],
       }
     })
 
+    /* The data that will be saved in the database, before
+      the file data has been included
+     */
     var serialized = {
       id,
       employee: this.state.data.employee,
       certificate: this.state.data.certificate,
+      issuer: this.state.data.issuer,
       startDate: this.state.data.startDate.format(),
       endDate: this.state.data.endDate && this.state.data.endDate.format(),
     };
@@ -219,6 +225,15 @@ export var CertsForm = React.createClass({
                     onChange={this.handleChange('certificate')}
                     />
                   {validationMessage('certificate')}
+                </label>
+                <label className="form-inline">
+                  Issuer
+                  <MySelect
+                    source="issuer"
+                    value={this.state.data.issuer}
+                    onChange={this.handleChange('issuer')}
+                    />
+                  {validationMessage('issuer')}
                 </label>
                 <label className="form-inline">
                   Validity
