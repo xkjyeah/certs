@@ -51,7 +51,7 @@ export var CertsForm = React.createClass({
       employee: this.state.data.employee,
       certificate: this.state.data.certificate,
       startDate: this.state.data.startDate.format(),
-      endDate: this.state.data.endDate.format(),
+      endDate: this.state.data.endDate && this.state.data.endDate.format(),
     };
 
     assert(id, "ID is empty!")

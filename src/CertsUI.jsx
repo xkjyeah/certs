@@ -92,7 +92,11 @@ export class CertsUI extends React.Component {
       expiringSoon: _(certList)
         .filter(c => c.endDate && c.endDate.valueOf() >= now)
         .sortBy(c => c.endDate && c.endDate.valueOf())
-        .value(),
+        .value().concat(
+          _(certList)
+          .filter(c => !c.endDate)
+          .value()
+        ),
       recent: _(certList)
         .filter(c => c.startDate && isFinite(c.startDate.valueOf()))
         .sortBy(c => c.startDate && -c.startDate.valueOf())
