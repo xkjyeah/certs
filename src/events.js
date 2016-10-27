@@ -51,13 +51,15 @@ events.on('requestReload', () => {
     }
 
     var validated = _.map(certificates, (cert, key) => {
-      let {startDate, endDate, employee, certificate, files} = cert;
+      let {startDate, endDate, employee, certificate,
+          files, issuer} = cert;
 
       return {
         id: key,
         endDate: tryParseDate(endDate),
         startDate: tryParseDate(startDate),
         employee: tryParseString(employee),
+        issuer: tryParseString(issuer),
         certificate: tryParseString(certificate),
         files: tryParseFiles(files),
       }
@@ -80,6 +82,11 @@ events.on('certificatesLoaded', (certs) => {
       .value(),
     certificates: _(certs)
       .map('certificate')
+      .uniq()
+      .sort()
+      .value(),
+    issuer: _(certs)
+      .map('issuer')
       .uniq()
       .sort()
       .value(),

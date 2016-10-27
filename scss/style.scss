@@ -146,12 +146,16 @@
             color: #888;
           }
         }
-      }
-      .edit-button {
-        flex: 0 0 none;
+        .edit-button {
+          flex: 0 0 none;
+        }
       }
 
-
+      .remarks {
+        .label {
+          color: #888;
+        }
+      }
 
       &:nth-child(odd) {
         background-color: #EEE;

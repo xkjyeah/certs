@@ -177,12 +177,12 @@ export var CertsForm = React.createClass({
       show: this.state.shown
     })
 
-    function validationMessage(which) {
+    let validationMessage = (which) => {
       if (this.state.validationErrors[which] &&
         !this.state.validationErrors[which][0]
       ) {
         return (
-          <span class="validation-error">
+          <span className="validation-error">
             {this.state.validationErrors[which][1]}
           </span>
         )

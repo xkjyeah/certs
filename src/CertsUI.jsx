@@ -160,7 +160,7 @@ export class CertsUI extends React.Component {
                 type="text"
                 />
           </label>
-          <button type="button" onClick={this.newCertificate}
+          <button type="button" onClick={this.newCertificate.bind(this)}
             className="btn btn-primary glyphicon glyphicon-plus"
             ></button>
         </div>

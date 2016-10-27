@@ -8963,6 +8963,7 @@
 	    key: 'newCertificate',
 	    value: function newCertificate() {
 	      _events2.default.emit('requestEdit', {
+	        employee: this.state.filter.employee,
 	        files: []
 	      });
 	    }
@@ -9009,7 +9010,9 @@
 	          return c.endDate && c.endDate.valueOf() >= now;
 	        }).sortBy(function (c) {
 	          return c.endDate && c.endDate.valueOf();
-	        }).value(),
+	        }).value().concat((0, _lodash2.default)(certList).filter(function (c) {
+	          return !c.endDate;
+	        }).value()),
 	        recent: (0, _lodash2.default)(certList).filter(function (c) {
 	          return c.startDate && isFinite(c.startDate.valueOf());
 	        }).sortBy(function (c) {
@@ -9082,7 +9085,7 @@
 	              type: 'text'
 	            })
 	          ),
-	          React.createElement('button', { type: 'button', onClick: this.newCertificate,
+	          React.createElement('button', { type: 'button', onClick: this.newCertificate.bind(this),
 	            className: 'btn btn-primary glyphicon glyphicon-plus'
 	          })
 	        ),
@@ -32678,6 +32681,17 @@
 	            ),
 	            React.createElement('button', { type: 'button', onClick: requestEdit,
 	              className: 'glyphicon glyphicon-pencil btn btn-default btn-xs edit-button' })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'remarks' },
+	            React.createElement(
+	              'span',
+	              { className: 'label' },
+	              'Issued by:'
+	            ),
+	            ' ',
+	            cert.issuer || ''
 	          )
 	        );
 	      });
@@ -32852,6 +32866,7 @@
 	      var employee = cert.employee;
 	      var certificate = cert.certificate;
 	      var files = cert.files;
+	      var issuer = cert.issuer;
 	
 	
 	      return {
@@ -32859,6 +32874,7 @@
 	        endDate: tryParseDate(endDate),
 	        startDate: tryParseDate(startDate),
 	        employee: tryParseString(employee),
+	        issuer: tryParseString(issuer),
 	        certificate: tryParseString(certificate),
 	        files: tryParseFiles(files)
 	      };
@@ -32875,7 +32891,8 @@
 	events.on('certificatesLoaded', function (certs) {
 	  var lists = {
 	    employees: (0, _lodash2.default)(certs).map('employee').uniq().sort().value(),
-	    certificates: (0, _lodash2.default)(certs).map('certificate').uniq().sort().value()
+	    certificates: (0, _lodash2.default)(certs).map('certificate').uniq().sort().value(),
+	    issuer: (0, _lodash2.default)(certs).map('issuer').uniq().sort().value()
 	  };
 	
 	  events.emit('listsUpdated', lists);
@@ -64798,9 +64815,11 @@
 	        id: '',
 	        employee: '',
 	        certificate: '',
+	        issuer: '',
 	        startDate: null,
 	        endDate: null
 	      },
+	      validationErrors: {},
 	      newFiles: [],
 	      deletedFiles: [],
 	      shown: false
@@ -64827,12 +64846,26 @@
 	
 	    var id = this.state.data.id || firebase.database().ref('certificates').push().key;
 	
+	    // HACK: validation messages:
+	    this.setState({
+	      validationErrors: {
+	        employee: [!!this.state.data.employee, "Employee name is required"],
+	        certificate: [!!this.state.data.certificate, "Certificate type is required"],
+	        issuer: [!!this.state.data.issuer, "Issuer is required"],
+	        startDate: [!!this.state.data.startDate, "Start date is required"]
+	      }
+	    });
+	
+	    /* The data that will be saved in the database, before
+	      the file data has been included
+	     */
 	    var serialized = {
 	      id: id,
 	      employee: this.state.data.employee,
 	      certificate: this.state.data.certificate,
+	      issuer: this.state.data.issuer,
 	      startDate: this.state.data.startDate.format(),
-	      endDate: this.state.data.endDate.format()
+	      endDate: this.state.data.endDate && this.state.data.endDate.format()
 	    };
 	
 	    (0, _assert2.default)(id, "ID is empty!");
@@ -64944,10 +64977,24 @@
 	    });
 	  },
 	  render: function render() {
+	    var _this6 = this;
+	
 	    var backdropClasses = (0, _classnames2.default)({
 	      backdrop: true,
 	      show: this.state.shown
 	    });
+	
+	    var validationMessage = function validationMessage(which) {
+	      if (_this6.state.validationErrors[which] && !_this6.state.validationErrors[which][0]) {
+	        return React.createElement(
+	          'span',
+	          { className: 'validation-error' },
+	          _this6.state.validationErrors[which][1]
+	        );
+	      } else {
+	        return '';
+	      }
+	    };
 	
 	    return React.createElement(
 	      'div',
@@ -64985,7 +65032,8 @@
 	                  source: 'employees',
 	                  value: this.state.data.employee,
 	                  onChange: this.handleChange('employee')
-	                })
+	                }),
+	                validationMessage('employee')
 	              ),
 	              React.createElement(
 	                'label',
@@ -64995,7 +65043,19 @@
 	                  source: 'certificates',
 	                  value: this.state.data.certificate,
 	                  onChange: this.handleChange('certificate')
-	                })
+	                }),
+	                validationMessage('certificate')
+	              ),
+	              React.createElement(
+	                'label',
+	                { className: 'form-inline' },
+	                'Issuer',
+	                React.createElement(_MySelect2.default, {
+	                  source: 'issuer',
+	                  value: this.state.data.issuer,
+	                  onChange: this.handleChange('issuer')
+	                }),
+	                validationMessage('issuer')
 	              ),
 	              React.createElement(
 	                'label',
@@ -65003,7 +65063,8 @@
 	                'Validity',
 	                React.createElement(_reactDatepicker2.default, { selected: this.state.data.startDate,
 	                  onChange: this.handleChange('startDate')
-	                })
+	                }),
+	                validationMessage('startDate')
 	              ),
 	              React.createElement(
 	                'label',
@@ -65011,7 +65072,8 @@
 	                'Expiry',
 	                React.createElement(_reactDatepicker2.default, { selected: this.state.data.endDate,
 	                  onChange: this.handleChange('endDate')
-	                })
+	                }),
+	                validationMessage('endDate')
 	              ),
 	              React.createElement(
 	                'table',
@@ -66583,7 +66645,9 @@
 	
 	      this.onListsUpdated = function (data) {
 	        _this2.setState({
-	          options: data[_this2.props.source].map(function (s) {
+	          options: data[_this2.props.source].concat([_this2.props.value]).filter(function (x) {
+	            return x;
+	          }).map(function (s) {
 	            return {
 	              value: s,
 	              label: s
@@ -69766,7 +69830,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 0px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 1em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n    .cert-list ul .cert-list-entry .edit-button {\n      flex: 0 0 none; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
+	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.validation-error {\n  color: #FF0000; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 0px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 1em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n      .cert-list ul .cert-list-entry .dates .edit-button {\n        flex: 0 0 none; }\n    .cert-list ul .cert-list-entry .remarks .label {\n      color: #888; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n", ""]);
 	
 	// exports
 

@@ -55,6 +55,9 @@ export default class CertList extends React.Component {
               className="glyphicon glyphicon-pencil btn btn-default btn-xs edit-button">
             </button>
           </div>
+          <div className="remarks">
+            <span className="label">Issued by:</span> {cert.issuer || ''}
+          </div>
         </li>
       )
     })

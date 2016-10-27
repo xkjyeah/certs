@@ -16,10 +16,13 @@ export default class MySelect extends React.Component {
   componentDidMount() {
     this.onListsUpdated = (data) => {
       this.setState({
-       options: data[this.props.source].map(s => ({
-         value: s,
-         label: s
-       })) || []
+       options: data[this.props.source]
+        .concat([this.props.value])
+        .filter(x => x)
+        .map(s => ({
+           value: s,
+           label: s
+         })) || []
       })
     };
 
