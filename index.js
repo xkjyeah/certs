@@ -65928,7 +65928,7 @@
 	              'div',
 	              { className: 'files-section' },
 	              'Current files:',
-	              React.createElement(_FileList2.default, { files: this.state.data.files,
+	              React.createElement(_FileList2.default, { key: this.state.shown, files: this.state.data.files,
 	                onChange: this.filesChanged,
 	                refreshFile: this.state.shown
 	              })
@@ -70410,6 +70410,7 @@
 	      deletedFiles: [],
 	      newFiles: []
 	    };
+	    _this.oldFiles = props.files;
 	    return _this;
 	  }
 	
@@ -70432,6 +70433,9 @@
 	
 	      this.setState({
 	        files: this.state.files.filter(function (x) {
+	          return x.key != whichFile.key;
+	        }),
+	        files2: this.state.files.filter(function (x) {
 	          return x.key != whichFile.key;
 	        }),
 	        deletedFiles: deletedFiles
