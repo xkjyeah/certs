@@ -29,7 +29,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server static"
+    "start": "http-server static",
+    "deploy": "gh-pages -d static"
   },
   "author": "",
   "license": "ISC"
