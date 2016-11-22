@@ -301,7 +301,7 @@ export var CertsForm = React.createClass({
                 Current files:
                 {/* <!-- refreshFile: force the stupid
                   input[type="file"] to reload --> */}
-                <FileList files={this.state.data.files}
+                <FileList key={this.state.shown} files={this.state.data.files}
                   onChange={this.filesChanged}
                   refreshFile={this.state.shown}
                   >

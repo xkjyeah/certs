@@ -12,6 +12,7 @@ export default class FileList extends React.Component {
       deletedFiles: [],
       newFiles: []
     }
+    this.oldFiles = props.files;
   }
 
   componentWillReceiveProps({files}) {
