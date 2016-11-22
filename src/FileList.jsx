@@ -19,7 +19,7 @@ export default class FileList extends React.Component {
       return;
 
     this.oldFiles = files;
-    this.setState({files})
+    this.setState({files, deletedFiles: []})
   }
 
   stageDelete(whichFile) {
@@ -78,13 +78,23 @@ class FileView extends React.Component {
     super(props, context)
 
     this.state = {
-      imageUrl: false
+      imageUrl: false,
+      isImage: false,
     }
   }
 
   componentDidMount() {
-    firebase.storage().ref(this.props.file.storageRef)
-      .getDownloadURL()
+    var fileRef = firebase.storage().ref(this.props.file.storageRef)
+
+    fileRef.getMetadata().then((metadata) => {
+      if (metadata.contentType.startsWith('image/')) {
+        this.setState({isImage: true});
+      } else {
+        this.setState({isImage: false});
+      }
+    })
+
+    fileRef.getDownloadURL()
       .then(url =>
         this.setState({imageUrl: url})
       )
@@ -99,18 +109,22 @@ class FileView extends React.Component {
   }
 
   render() {
+    const deleteButton = (
+      <button type="button"
+        className="glyphicon glyphicon-trash btn btn-default"
+        onClick={() => this.onDelete()}
+        ></button>
+    );
     return this.state.imageUrl ? (
       <span className="uploaded-image">
         <a href={this.state.imageUrl} target="_blank">
-          <img src={this.state.imageUrl} alt="Loading..." />
+          {this.state.isImage ? <img src={this.state.imageUrl} alt="Loading..." />
+        : <span className="view-button">View...</span>}
         </a>
-        <button type="button"
-          className="glyphicon glyphicon-trash btn btn-default"
-          onClick={() => this.onDelete()}
-          ></button>
+        {deleteButton}
       </span>
     ) :
-    (this.state.imageUrl === null) ? (<span>Error loading image.</span>) :
+    (this.state.imageUrl === null) ? (<span>Error loading image. {deleteButton}</span>) :
     (<span>Loading image...</span>)
   }
 }

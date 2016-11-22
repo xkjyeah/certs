@@ -144,14 +144,21 @@ export class CertsUI extends React.Component {
           {' '}
 
           <button onClick={this.logout}
-            className="btn btn-default glyphicon glyphicon-log-out">
+            className="btn btn-default">
+
+            <i className="glyphicon glyphicon-log-out"></i>
+            &nbsp;Log out...
           </button>;
         </div>
       )
          :
-      <button onClick={this.login}
-        className="btn btn-default glyphicon glyphicon-log-in"
-        ></button>;
+      (<div>
+        <button onClick={this.login}
+          className="btn btn-default">
+          <i className="glyphicon glyphicon-log-in"></i>
+          &nbsp;Log in...
+        </button>
+      </div>);
 
     return (
       <main>
