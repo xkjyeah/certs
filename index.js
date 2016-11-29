@@ -46,7 +46,7 @@
 
 	__webpack_require__(1);
 	__webpack_require__(298);
-	module.exports = __webpack_require__(743);
+	module.exports = __webpack_require__(744);
 
 
 /***/ },
@@ -8973,6 +8973,8 @@
 	
 	var _CertsTable = __webpack_require__(742);
 	
+	var _CertsPivot = __webpack_require__(743);
+	
 	var _MySelect = __webpack_require__(716);
 	
 	var _MySelect2 = _interopRequireDefault(_MySelect);
@@ -9036,7 +9038,8 @@
 	        referenceDate: (0, _moment2.default)()
 	      },
 	      auth: { user: null },
-	      certificates: []
+	      certificates: [],
+	      display: 'list'
 	    };
 	
 	    _this.mountedPromise = new _promise2.default(function (resolve) {
@@ -9166,6 +9169,8 @@
 	        )
 	      );
 	
+	      var display = this.state.display === 'list' ? React.createElement(_CertsTable.CertsTable, { certs: filteredCerts }) : React.createElement(_CertsPivot.CertsPivot, { certs: filteredCerts });
+	
 	      return React.createElement(
 	        'main',
 	        null,
@@ -9223,6 +9228,7 @@
 	            }),
 	            'Expired on'
 	          ),
+	          '|',
 	          React.createElement(
 	            'label',
 	            { className: 'form-inline' },
@@ -9234,6 +9240,36 @@
 	              }
 	            })
 	          ),
+	          '|',
+	          React.createElement(
+	            'label',
+	            { className: 'certificates-filter' },
+	            React.createElement('input', {
+	              checked: this.state.display === 'list',
+	              onChange: function onChange(e) {
+	                return _this4.setState({ display: e.currentTarget.value });
+	              },
+	              value: 'list',
+	              type: 'radio',
+	              name: 'display-type'
+	            }),
+	            'Show list'
+	          ),
+	          React.createElement(
+	            'label',
+	            { className: 'certificates-filter' },
+	            React.createElement('input', {
+	              checked: this.state.display === 'pivot',
+	              onChange: function onChange(e) {
+	                return _this4.setState({ display: e.currentTarget.value });
+	              },
+	              value: 'pivot',
+	              type: 'radio',
+	              name: 'display-type'
+	            }),
+	            'Show summary'
+	          ),
+	          '|',
 	          React.createElement(
 	            'button',
 	            { type: 'button', onClick: this.newCertificate.bind(this),
@@ -9243,7 +9279,7 @@
 	            'Add certificate'
 	          )
 	        ),
-	        React.createElement(_CertsTable.CertsTable, { certs: filteredCerts }),
+	        display,
 	        React.createElement(_CertsForm.CertsForm, { onSave: this.reload.bind(this) })
 	      );
 	    }
@@ -70923,10 +70959,183 @@
 /* 743 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.CertsPivot = undefined;
+	
+	var _typeof2 = __webpack_require__(377);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
+	
+	var _getPrototypeOf = __webpack_require__(371);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _classCallCheck2 = __webpack_require__(375);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(396);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(376);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(400);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
+	
+	var _react = __webpack_require__(408);
+	
+	var React = _interopRequireWildcard(_react);
+	
+	var _reactDom = __webpack_require__(440);
+	
+	var ReactDOM = _interopRequireWildcard(_reactDom);
+	
+	var _events = __webpack_require__(580);
+	
+	var _events2 = _interopRequireDefault(_events);
+	
+	var _CertList = __webpack_require__(579);
+	
+	var _CertList2 = _interopRequireDefault(_CertList);
+	
+	var _Downloader = __webpack_require__(704);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var CertsPivot = exports.CertsPivot = function (_React$Component) {
+	  (0, _inherits3.default)(CertsPivot, _React$Component);
+	
+	  function CertsPivot(props, context) {
+	    (0, _classCallCheck3.default)(this, CertsPivot);
+	
+	    var _this = (0, _possibleConstructorReturn3.default)(this, (CertsPivot.__proto__ || (0, _getPrototypeOf2.default)(CertsPivot)).call(this, props, context));
+	
+	    _this.state = {
+	      rowCategories: [],
+	      colCategories: []
+	    };
+	    return _this;
+	  }
+	
+	  (0, _createClass3.default)(CertsPivot, [{
+	    key: 'render',
+	    value: function render() {
+	      var rowCategories = _(this.props.certs).map(function (c) {
+	        return c.employee;
+	      }).uniqBy().sort().value();
+	
+	      var colCategories = _(this.props.certs).map(function (c) {
+	        return c.certificate;
+	      }).uniqBy().sort().value();
+	
+	      var data = _(this.props.certs).groupBy(function (c) {
+	        return c.employee;
+	      }).mapValues(function (cs) {
+	        return _.groupBy(cs, function (c) {
+	          return c.certificate;
+	        });
+	      }).value();
+	
+	      function renderCell(cs, e, i) {
+	        if (!cs) {
+	          return React.createElement('td', { key: 'empty-' + e + '-' + i, colSpan: '2', className: 'empty' });
+	        } else {
+	          var _ret = function () {
+	            var c = _.maxBy(cs, function (c) {
+	              return c.startDate;
+	            });
+	            var requestEdit = function requestEdit() {
+	              _events2.default.emit('requestEdit', c);
+	            };
+	
+	            return {
+	              v: [React.createElement(
+	                'td',
+	                { key: c.id + '-issued',
+	                  onClick: requestEdit,
+	                  title: e + ', ' + i,
+	                  className: 'issued' },
+	                c.startDate && c.startDate.format('DD MMM YYYY')
+	              ), React.createElement(
+	                'td',
+	                { key: c.id + '-expires',
+	                  onClick: requestEdit,
+	                  title: e + ', ' + i,
+	                  className: 'expires' },
+	                c.endDate && c.endDate.format('DD MMM YYYY')
+	              )]
+	            };
+	          }();
+	
+	          if ((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
+	        }
+	      }
+	
+	      return React.createElement(
+	        'section',
+	        { className: 'certificates-pivot-table' },
+	        React.createElement(
+	          'table',
+	          { className: 'table table-hover table-striped' },
+	          React.createElement(
+	            'thead',
+	            null,
+	            React.createElement(
+	              'tr',
+	              null,
+	              React.createElement('th', null),
+	              colCategories.map(function (c) {
+	                return React.createElement(
+	                  'th',
+	                  { key: 'col-' + c, colSpan: '2' },
+	                  c
+	                );
+	              })
+	            )
+	          ),
+	          React.createElement(
+	            'tbody',
+	            null,
+	            rowCategories.map(function (e) {
+	              return React.createElement(
+	                'tr',
+	                { key: 'row-' + e },
+	                React.createElement(
+	                  'th',
+	                  null,
+	                  e
+	                ),
+	                _.flatten(colCategories.map(function (c) {
+	                  return renderCell(data[e][c], e, c);
+	                }))
+	              );
+	            })
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	  return CertsPivot;
+	}(React.Component);
+
+/***/ },
+/* 744 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(744);
+	var content = __webpack_require__(745);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(737)(content, {});
@@ -70946,7 +71155,7 @@
 	}
 
 /***/ },
-/* 744 */
+/* 745 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(736)();
@@ -70954,7 +71163,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.validation-error {\n  color: #FF0000; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 0px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 1em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image .view-button {\n    margin-top: 2em;\n    padding: 2em 1em 2em 1em;\n    border: solid 1px #888;\n    display: inline-block; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n      .cert-list ul .cert-list-entry .dates .edit-button {\n        flex: 0 0 none; }\n    .cert-list ul .cert-list-entry .remarks .label {\n      color: #888; }\n      .cert-list ul .cert-list-entry .remarks .label.secondary {\n        opacity: 0.0;\n        font-weight: normal; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n      .cert-list ul .cert-list-entry:hover .remarks .label.secondary {\n        opacity: 0.8; }\n", ""]);
+	exports.push([module.id, ".filter-area .Select {\n  width: 20em; }\n\n.validation-error {\n  color: #FF0000; }\n\n.backdrop {\n  background-color: rgba(0, 0, 0, 0.5);\n  position: fixed;\n  left: 0;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  display: none; }\n  .backdrop .certs-form {\n    overflow: auto;\n    position: absolute;\n    left: 50px;\n    top: 50px;\n    bottom: 50px;\n    right: 50px;\n    background: white;\n    padding: 0px; }\n    .backdrop .certs-form .wrap-section {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap; }\n      .backdrop .certs-form .wrap-section .files-section, .backdrop .certs-form .wrap-section .inputs-section {\n        padding: 1em; }\n      .backdrop .certs-form .wrap-section .files-section {\n        flex: 1 0 300px; }\n      .backdrop .certs-form .wrap-section .inputs-section {\n        flex: 0.3 0 300px; }\n    .backdrop .certs-form input[type=\"file\"] {\n      border: dashed 2px #9CF;\n      width: 100%;\n      height: 4em; }\n    .backdrop .certs-form label {\n      display: block; }\n  .backdrop.show {\n    display: block; }\n\n.dashboard {\n  display: flex;\n  flex-direction: row;\n  height: 300px; }\n  .dashboard .cert-list {\n    flex: 1 1 33%; }\n\n.file-preview img {\n  max-width: 150px;\n  max-height: 150px; }\n\n.uploaded-image {\n  display: inline-block;\n  position: relative; }\n  .uploaded-image img {\n    max-width: 150px;\n    max-height: 150px; }\n  .uploaded-image .view-button {\n    margin-top: 2em;\n    padding: 2em 1em 2em 1em;\n    border: solid 1px #888;\n    display: inline-block; }\n  .uploaded-image button {\n    opacity: 0.5;\n    position: absolute;\n    right: 10px;\n    top: 10px; }\n    .uploaded-image button:hover {\n      opacity: 1.0; }\n\n.cert-list ul {\n  padding: 0.2em;\n  margin: 0em; }\n  .cert-list ul .cert-list-entry {\n    list-style-type: none;\n    padding: 0.3em;\n    margin: 0em; }\n    .cert-list ul .cert-list-entry .name-cert {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em;\n      font-size: 120%; }\n      .cert-list ul .cert-list-entry .name-cert .employee {\n        font-weight: bold;\n        flex: 1 1 auto; }\n      .cert-list ul .cert-list-entry .name-cert .certificate {\n        text-align: right;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .name-cert .certificate .files {\n          font-size: 80%; }\n    .cert-list ul .cert-list-entry .dates {\n      display: flex;\n      flex-direction: row;\n      flex-wrap: wrap;\n      justify-content: center;\n      padding: 0.2em 0.4em; }\n      .cert-list ul .cert-list-entry .dates .startDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .startDate:before {\n          content: \"Valid from \";\n          color: #888;\n          font-size: 80%; }\n      .cert-list ul .cert-list-entry .dates .endDate {\n        text-align: center;\n        flex: 1 1 auto; }\n        .cert-list ul .cert-list-entry .dates .endDate:before {\n          content: \" to \";\n          font-size: 80%;\n          color: #888; }\n      .cert-list ul .cert-list-entry .dates .edit-button {\n        flex: 0 0 none; }\n    .cert-list ul .cert-list-entry .remarks .label {\n      color: #888; }\n      .cert-list ul .cert-list-entry .remarks .label.secondary {\n        opacity: 0.0;\n        font-weight: normal; }\n    .cert-list ul .cert-list-entry:nth-child(odd) {\n      background-color: #EEE; }\n    .cert-list ul .cert-list-entry:nth-child(even) {\n      background-color: #FFF; }\n    .cert-list ul .cert-list-entry:hover {\n      background-color: #ABF; }\n      .cert-list ul .cert-list-entry:hover .remarks .label.secondary {\n        opacity: 0.8; }\n\n.certificates-pivot-table td.issued, .certificates-pivot-table td.empty {\n  border-left: solid 1px grey; }\n\n.certificates-pivot-table td.issued, .certificates-pivot-table td.expires {\n  cursor: pointer; }\n", ""]);
 	
 	// exports
 
