@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import {CertsDashboard} from './CertsDashboard.jsx';
 import {CertsForm} from './CertsForm.jsx';
 import {CertsTable} from './CertsTable.jsx';
+import {CertsPivot} from './CertsPivot.jsx';
 import MySelect from './MySelect.jsx';
 import DatePicker from 'react-datepicker';
 import * as firebase from 'firebase';
@@ -37,7 +38,8 @@ export class CertsUI extends React.Component {
         referenceDate: moment()
       },
       auth: {user: null},
-      certificates: []
+      certificates: [],
+      display: 'list'
     }
 
     this.mountedPromise = new Promise((resolve) => {
@@ -160,6 +162,10 @@ export class CertsUI extends React.Component {
         </button>
       </div>);
 
+    let display = this.state.display === 'list' ?
+      (<CertsTable certs={filteredCerts}></CertsTable>) :
+      (<CertsPivot certs={filteredCerts}></CertsPivot>)
+
     return (
       <main>
         {loginArea}
@@ -199,6 +205,7 @@ export class CertsUI extends React.Component {
                 />
               Expired on
           </label>
+          |
 
           <label className="form-inline">
             Reference date:
@@ -207,6 +214,30 @@ export class CertsUI extends React.Component {
               onChange={e => this.updateFilter('referenceDate', e)}
               />
           </label>
+          |
+
+          <label className="certificates-filter">
+            <input
+                checked={this.state.display === 'list'}
+                onChange={(e) => this.setState({display: e.currentTarget.value})}
+                value="list"
+                type="radio"
+                name="display-type"
+                />
+              Show list
+          </label>
+
+          <label className="certificates-filter">
+            <input
+                checked={this.state.display === 'pivot'}
+                onChange={(e) => this.setState({display: e.currentTarget.value})}
+                value="pivot"
+                type="radio"
+                name="display-type"
+                />
+              Show summary
+          </label>
+          |
 
           <button type="button" onClick={this.newCertificate.bind(this)}
             className="btn btn-primary"
@@ -215,8 +246,7 @@ export class CertsUI extends React.Component {
             Add certificate
           </button>
         </div>
-        <CertsTable certs={filteredCerts}></CertsTable>
-        {/*<CertsDashboard data={dashboardData}></CertsDashboard> */}
+        {display}
         <CertsForm onSave={this.reload.bind(this)}></CertsForm>
       </main>
     )

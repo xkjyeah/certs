@@ -185,3 +185,12 @@
     }
   }
 }
+
+.certificates-pivot-table {
+  td.issued, td.empty {
+    border-left: solid 1px grey;
+  }
+  td.issued, td.expires {
+    cursor: pointer;
+  }
+}
