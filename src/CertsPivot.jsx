@@ -10,6 +10,7 @@ export class CertsPivot extends React.Component {
     this.state = {
       rowCategories: [],
       colCategories: [],
+      hiddenCertificates: {}
     }
   }
   render() {
@@ -52,24 +53,54 @@ export class CertsPivot extends React.Component {
       }
     }
 
+    const renderHiddenCertificate = (cert) => {
+      const showCertificate = () => this.setState({
+        hiddenCertificates: _.omit(this.state.hiddenCertificates, [cert])
+      });
+
+      return (<li key={cert} onClick={showCertificate}>{cert}</li>)
+    }
+
     return (
       <section className="certificates-pivot-table">
+        <b>Hidden certificates:</b>
+        <ul className="hidden-certificates">
+          {_(this.state.hiddenCertificates).keys().sortBy().map(renderHiddenCertificate).value()}
+        </ul>
         <table className="table table-hover table-striped">
           <thead>
             <tr>
               <th></th>
               {
-                colCategories.map(c => (<th key={`col-${c}`} colSpan="2">{c}</th>))
+                colCategories
+                .filter(r => !(r in this.state.hiddenCertificates))
+                .map(c => {
+                  const hideCertificate = (e) => {
+                    e.preventDefault();
+                    this.setState({
+                      hiddenCertificates: _.defaults({
+                        [c]: true,
+                      }, this.state.hiddenCertificates)
+                    })
+                  };
+                  return (<th key={`col-${c}`} colSpan="2">
+                    {c}
+                    <a href="#" onClick={hideCertificate}>[-]</a>
+                  </th>)
+                })
               }
             </tr>
           </thead>
           <tbody>
             {
-              rowCategories.map(e => (
+              rowCategories
+              .map(e => (
                 <tr key={`row-${e}`}>
                   <th>{e}</th>
                   {
-                    _.flatten(colCategories.map(c => renderCell(data[e][c], e, c)))
+                    _.flatten(colCategories
+                      .filter(r => !(r in this.state.hiddenCertificates))
+                      .map(c => renderCell(data[e][c], e, c)))
                   }
                 </tr>
               ))

@@ -194,3 +194,17 @@
     cursor: pointer;
   }
 }
+
+.hidden-certificates {
+  display: inline;
+  padding: 0;
+  margin: 0;
+
+  li {
+    list-style-type: none;
+    display: inline;
+    &:after {
+      content: ", ";
+    }
+  }
+}
