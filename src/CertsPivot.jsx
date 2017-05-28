@@ -10,7 +10,8 @@ export class CertsPivot extends React.Component {
     this.state = {
       rowCategories: [],
       colCategories: [],
-      hiddenCertificates: {}
+      hiddenCertificates: {},
+      hiddenEmployees: {},
     }
   }
   render() {
@@ -61,12 +62,39 @@ export class CertsPivot extends React.Component {
       return (<li key={cert} onClick={showCertificate}>{cert}</li>)
     }
 
+    const renderHiddenEmployees = (cert) => {
+      const showEmployee = () => this.setState({
+        hiddenEmployees: _.omit(this.state.hiddenEmployees, [cert])
+      });
+
+      return (<li key={cert} onClick={showEmployee}>{cert}</li>)
+    }
+
+    const hideEmployee = (event, e) => {
+      event.preventDefault()
+      this.setState({
+        hiddenEmployees: {
+          ...this.state.hiddenEmployees,
+          [e]: true
+        }
+      });
+    }
+
     return (
       <section className="certificates-pivot-table">
-        <b>Hidden certificates:</b>
-        <ul className="hidden-certificates">
-          {_(this.state.hiddenCertificates).keys().sortBy().map(renderHiddenCertificate).value()}
-        </ul>
+        <div>
+          <b>Hidden certificates:</b>
+          <ul className="hidden-certificates">
+            {_(this.state.hiddenCertificates).keys().sortBy().map(renderHiddenCertificate).value()}
+          </ul>
+        </div>
+        <div>
+          <b>Hidden employees:</b>
+          <ul className="hidden-certificates">
+            {_(this.state.hiddenEmployees).keys().sortBy().map(renderHiddenEmployees).value()}
+          </ul>
+        </div>
+
         <table className="table table-hover table-striped">
           <thead>
             <tr>
@@ -78,9 +106,10 @@ export class CertsPivot extends React.Component {
                   const hideCertificate = (e) => {
                     e.preventDefault();
                     this.setState({
-                      hiddenCertificates: _.defaults({
+                      hiddenCertificates: {
+                        ...this.state.hiddenCertificates,
                         [c]: true,
-                      }, this.state.hiddenCertificates)
+                      }
                     })
                   };
                   return (<th key={`col-${c}`} colSpan="2">
@@ -94,9 +123,13 @@ export class CertsPivot extends React.Component {
           <tbody>
             {
               rowCategories
+              .filter(e => !(e in this.state.hiddenEmployees))
               .map(e => (
                 <tr key={`row-${e}`}>
-                  <th>{e}</th>
+                  <th>
+                    {e}
+                    <a href="#" onClick={(event) => hideEmployee(event, e)}>[-]</a>
+                  </th>
                   {
                     _.flatten(colCategories
                       .filter(r => !(r in this.state.hiddenCertificates))
