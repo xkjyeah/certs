@@ -1,5 +1,4 @@
 import * as React from 'react';
-import events from './events';
 
 export class CertsPivot extends React.Component {
   constructor(props, context) {

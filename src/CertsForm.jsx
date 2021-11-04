@@ -4,7 +4,6 @@ import * as firebaseAuth from 'firebase/auth';
 import * as firebaseStorage from 'firebase/storage';
 import {ref, push, set} from 'firebase/database';
 import assert from 'assert';
-import events from './events';
 import _ from 'lodash';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';

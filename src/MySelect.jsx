@@ -1,6 +1,6 @@
 import {Creatable} from 'react-select';
 import React from 'react';
-import events, { SingletonListsConsumer } from './events';
+import { SingletonListsConsumer } from './events';
 
 import 'react-select/dist/react-select.css';
 

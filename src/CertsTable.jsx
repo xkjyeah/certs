@@ -1,5 +1,4 @@
 import * as React from 'react';
-import events from './events';
 import {Downloader} from './Downloader.jsx';
 
 export class CertsTable extends React.Component {
