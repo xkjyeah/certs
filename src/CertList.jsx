@@ -1,7 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import events from './events';
-import firebase from 'firebase';
 import {Downloader} from './Downloader.jsx';
 
 export default class CertList extends React.Component {
@@ -12,7 +10,7 @@ export default class CertList extends React.Component {
     }
   }
 
-  showMore() {
+  showMore = () => {
     this.setState({
       shown: this.state.shown + 20
     })

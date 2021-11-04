@@ -1,5 +1,6 @@
 import EventEmitter from "events";
-import firebase from 'firebase';
+import * as firebaseDatabase from 'firebase/database';
+import {ref, child, get} from 'firebase/database';
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -8,7 +9,9 @@ var events = new EventEmitter();
 export default events;
 
 events.on('requestReload', () => {
-  firebase.database().ref('certificates').once('value')
+  const db = firebaseDatabase.getDatabase()
+
+  get(ref(db, 'certificates'))
   .then(x => {
     let certificates = x.val()
 

@@ -1,7 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import events from './events';
-import CertList from './CertList.jsx';
 import {Downloader} from './Downloader.jsx';
 
 export class CertsTable extends React.Component {
@@ -13,7 +11,7 @@ export class CertsTable extends React.Component {
       orderByField: 'startDate',
     }
   }
-  orderBy(field, fn) {
+  orderBy = (field, fn) => {
     return () => {
       this.setState({
         orderBy: fn || field,
@@ -33,8 +31,6 @@ export class CertsTable extends React.Component {
         let requestEdit = () => {
           events.emit('requestEdit', row)
         }
-        console.log(typeof this.state.orderBy == 'function' &&
-        this.state.orderBy(row))
 
         let attachments = row.files.map(x =>
               (<Downloader key={x.storageRef}

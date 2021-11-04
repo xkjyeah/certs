@@ -1,10 +1,8 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import CertList from './CertList.jsx';
 
-export var CertsDashboard = React.createClass({
+export class CertsDashboard extends React.Component {
   render() {
-    console.log(this.props);
     return (
       <section className="dashboard">
         <CertList data={this.props.data.expiringSoon} title="Expiring Soon"
@@ -22,4 +20,4 @@ export var CertsDashboard = React.createClass({
       </section>
     )
   }
-})
+}

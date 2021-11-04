@@ -1,7 +1,8 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as LinkedStateMixin from 'react-addons-linked-state-mixin';
-import * as firebase from 'firebase';
+import * as firebaseDatabase from 'firebase/database';
+import * as firebaseAuth from 'firebase/auth';
+import * as firebaseStorage from 'firebase/storage';
+import {ref, push, set} from 'firebase/database';
 import assert from 'assert';
 import events from './events';
 import _ from 'lodash';
@@ -13,10 +14,13 @@ import classnames from 'classnames';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-export var CertsForm = React.createClass({
-  mixins: [LinkedStateMixin],
-  getInitialState() {
-    return {
+export class CertsForm extends React.Component {
+  constructor() {
+    super()
+    this.db = firebaseDatabase.getDatabase()
+    this.auth = firebaseAuth.getAuth()
+    this.storage = firebaseStorage.getStorage()
+    this.state = {
       data: {
         id: '',
         employee: '',
@@ -30,7 +34,7 @@ export var CertsForm = React.createClass({
       deletedFiles: [],
       shown: false
     }
-  },
+  }
   componentDidMount() {
     this.requestEditListener = (certEntry) => {
       this.setState({
@@ -41,11 +45,11 @@ export var CertsForm = React.createClass({
       })
     };
     events.on('requestEdit', this.requestEditListener);
-  },
+  }
   componentWillUnmount() {
     events.removeListener('requestEdit', this.requestEditListener);
-  },
-  validate() {
+  }
+  validate = () => {
     let validationErrors = {
       employee: [!!this.state.data.employee, "Employee name is required"],
       certificate: [!!this.state.data.certificate, "Certificate type is required"],
@@ -69,9 +73,9 @@ export var CertsForm = React.createClass({
       })
       return false;
     }
-  },
-  save(event) {
-    var id = this.state.data.id || firebase.database().ref(`certificates`).push().key
+  }
+  save = (event) => {
+    var id = this.state.data.id || push(ref(this.db, `certificates`)).key
 
     // HACK: validation messages:
     if (!this.validate()) {
@@ -90,21 +94,21 @@ export var CertsForm = React.createClass({
       endDate: this.state.data.endDate && this.state.data.endDate.format(),
       createdAt: (this.state.data.createdAt && this.state.data.createdAt.format()) || moment().format(),
       updatedAt: moment().format(),
-      createdBy: this.state.data.createdBy || firebase.auth().currentUser.email,
-      updatedBy: firebase.auth().currentUser.email,
+      createdBy: this.state.data.createdBy || this.auth.currentUser.email,
+      updatedBy: this.auth.currentUser.email,
     };
 
     assert(id, "ID is empty!")
 
     let fileDeletePromise = Promise.all(
       this.state.deletedFiles.map(f =>
-        firebase.storage().ref(f.storageRef).delete()
+        firebaseStorage.deleteObject(firebaseStorage.ref(this.storage, f.storageRef))
         .then(() => f)
       )
     )
 
     const newFileKeys = this.state.newFiles.map(() =>
-      firebase.database().ref(`certificates/${id}/files/`).push().key)
+      push(ref(this.db, `certificates/${id}/files/`)).key)
 
     let fileUploadPromise = Promise.all(
       _.zip(this.state.newFiles, newFileKeys)
@@ -112,7 +116,7 @@ export var CertsForm = React.createClass({
         let now = Date.now();
         let storageRef = `certificates/${id}/files/${key}`;
 
-        return firebase.storage().ref(storageRef).put(f)
+        return firebaseStorage.uploadBytes(firebaseStorage.ref(this.storage, storageRef), f)
           .then(() => ({
             key,
             storageRef,
@@ -121,7 +125,6 @@ export var CertsForm = React.createClass({
       })
     )
 
-    // console.log(serialized)
     let allTasksPromise = Promise.all([
       fileDeletePromise,
       fileUploadPromise
@@ -138,7 +141,7 @@ export var CertsForm = React.createClass({
         this.state.data.files.length - deleted.length + uploaded.length,
         "Number of files don't match. Data may be lost");
 
-      return firebase.database().ref(`certificates/${id}`).set(serialized)
+      return set(ref(this.db, `certificates/${id}`), serialized)
     })
     .catch((err) => {
       alert(JSON.stringify(err));
@@ -147,8 +150,8 @@ export var CertsForm = React.createClass({
 
     allTasksPromise.then(this.props.onSave)
     .then(() => this.dismiss());
-  },
-  delete(event) {
+  }
+  delete = (event) => {
     if (!confirm("Are you sure you want to delete this certificate?")) {
       return;
     }
@@ -156,20 +159,20 @@ export var CertsForm = React.createClass({
 
     assert(id, "Cannot delete empty ID")
 
-    let deletePromise = firebase.database().ref(`certificates/${id}`).remove()
+    let deletePromise = firebaseDatabase.remove(ref(this.db, `certificates/${id}`))
 
     deletePromise.then(this.props.onSave)
-    deletePromise.then(() => this.dismiss())
-  },
-  dismiss() {
+    deletePromise.then(this.dismiss)
+  }
+  dismiss = () => {
     this.setState({shown: false});
-  },
-  setData(newData) {
+  }
+  setData = (newData) => {
     return this.setState({
       data: _.assign({}, this.state.data, newData)
     })
-  },
-  handleChange(field) {
+  }
+  handleChange = (field) => {
     return (date) => {
       this.setData(
         _.fromPairs([
@@ -177,8 +180,8 @@ export var CertsForm = React.createClass({
         ])
       )
     }
-  },
-  adjustDate(number, unit) {
+  }
+  adjustDate = (number, unit) => {
     return () => {
       var ref = this.state.data.endDate || this.state.data.startDate || moment();
 
@@ -188,13 +191,12 @@ export var CertsForm = React.createClass({
         endDate: ref
       })
     }
-  },
-  filesChanged(newFiles, deletedFiles) {
-    console.log(newFiles, deletedFiles)
+  }
+  filesChanged = (newFiles, deletedFiles) => {
     this.setState({
       newFiles, deletedFiles
     })
-  },
+  }
 
   render() {
     let backdropClasses = classnames({
@@ -215,6 +217,10 @@ export var CertsForm = React.createClass({
       else {
         return '';
       }
+    }
+
+    if (!this.state.data) {
+      return
     }
 
     return (
@@ -279,18 +285,18 @@ export var CertsForm = React.createClass({
                     <tr>
                       <td><button className="btn btn-default"
                         type="button"
-                        onClick={this.adjustDate(1, 'year')}>+年</button></td>
+                        onClick={this.adjustDate(1, 'year')}>+YY</button></td>
                       <td><button className="btn btn-default"
                         type="button"
-                        onClick={this.adjustDate(1, 'month')}>+月</button></td>
+                        onClick={this.adjustDate(1, 'month')}>+M</button></td>
                       <td><button className="btn btn-default"
                         type="button"
-                        onClick={this.adjustDate(1, 'day')}>+日</button></td>
+                        onClick={this.adjustDate(1, 'day')}>+D</button></td>
                     </tr>
                     <tr>
-                      <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'year')}>-年</button></td>
-                      <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'month')}>-月</button></td>
-                      <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'day')}>-日</button></td>
+                      <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'year')}>-YY</button></td>
+                      <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'month')}>-M</button></td>
+                      <td><button className="btn btn-default" type="button" onClick={this.adjustDate(-1, 'day')}>-D</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -322,4 +328,4 @@ export var CertsForm = React.createClass({
       </div>
     )
   }
-})
+}

@@ -1,12 +1,9 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import {CertsDashboard} from './CertsDashboard.jsx';
 import {CertsForm} from './CertsForm.jsx';
 import {CertsTable} from './CertsTable.jsx';
 import {CertsPivot} from './CertsPivot.jsx';
-import MySelect from './MySelect.jsx';
 import DatePicker from 'react-datepicker';
-import * as firebase from 'firebase';
+import * as firebaseAuth from 'firebase/auth';
 import _ from 'lodash';
 import moment from 'moment';
 import events from './events';
@@ -14,16 +11,18 @@ import events from './events';
 moment.locale('en-GB')
 
 export class CertsUI extends React.Component {
-  login() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithRedirect(provider)
+  login = () => {
+    const provider = new firebaseAuth.GoogleAuthProvider();
+    firebaseAuth.signInWithRedirect(this.auth, provider)
   }
-  logout() {
-    firebase.auth().signOut();
+  logout = () => {
+    this.auth.signOut();
   }
 
   constructor(props, context) {
     super(props, context);
+
+    this.auth = firebaseAuth.getAuth()
 
     this.state = {
       dashboardData: {
@@ -46,7 +45,7 @@ export class CertsUI extends React.Component {
       this._mountedPromiseResolver = resolve;
     })
 
-    firebase.auth().onAuthStateChanged((user) => {
+    firebaseAuth.onAuthStateChanged(this.auth, (user) => {
       this.mountedPromise.then(() => {
         this.setState({auth: {user}})
         this.reload();
@@ -54,11 +53,11 @@ export class CertsUI extends React.Component {
     });
   }
 
-  reload() {
+  reload = () => {
     events.emit('requestReload')
   }
 
-  newCertificate() {
+  newCertificate = () => {
     events.emit('requestEdit', {
       employee: this.state.filter.employee,
       startDate: null,
@@ -83,7 +82,7 @@ export class CertsUI extends React.Component {
     events.removeListener('certificatesLoaded', this.onCertificatesLoaded);
   }
 
-  updateFilter(field, value) {
+  updateFilter = (field, value) => {
     this.setState({
       filter: _.defaults(_.fromPairs([
         [field, value]
@@ -91,7 +90,7 @@ export class CertsUI extends React.Component {
     })
   }
 
-  _dashboardData(certList) {
+  _dashboardData = (certList) => {
     let now = Date.now();
     return {
       recentlyExpired: _(certList)
@@ -114,7 +113,7 @@ export class CertsUI extends React.Component {
     }
   }
 
-  _filter(certList) {
+  _filter = (certList) => {
     let now = this.state.filter.referenceDate || moment();
     return certList.filter(c =>
       (!this.state.filter.employee ||

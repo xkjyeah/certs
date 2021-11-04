@@ -1,8 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import events from './events';
-import CertList from './CertList.jsx';
-import {Downloader} from './Downloader.jsx';
 
 export class CertsPivot extends React.Component {
   constructor(props, context) {

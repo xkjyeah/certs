@@ -1,11 +1,12 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import firebase from 'firebase';
+import * as firebaseStorage from 'firebase/storage';
 import FileUpload from './FileUpload.jsx';
 
 export default class FileList extends React.Component {
   constructor(props, context) {
     super(props, context);
+
+    this.storage = firebaseStorage.getStorage()
 
     this.state = {
       files: props.files || [],
@@ -23,11 +24,12 @@ export default class FileList extends React.Component {
     this.setState({files, deletedFiles: []})
   }
 
-  stageDelete(whichFile) {
+  stageDelete = (whichFile) => {
     let deletedFiles = this.state.deletedFiles.concat([whichFile])
 
     this.setState({
       files: this.state.files.filter(x => x.key != whichFile.key),
+      files2: this.state.files.filter(x => x.key != whichFile.key),
       deletedFiles
     })
     this.props.onChange && this.props.onChange(
@@ -37,7 +39,7 @@ export default class FileList extends React.Component {
     setTimeout(() => console.log(this.state.files), 1000);
   }
 
-  stageAdd(files) {
+  stageAdd = (files) => {
     this.setState({
       newFiles: files
     })
@@ -77,17 +79,19 @@ export default class FileList extends React.Component {
 class FileView extends React.Component {
   constructor(props, context) {
     super(props, context)
-
+    this.storage = firebaseStorage.getStorage()
     this.state = {
       imageUrl: false,
       isImage: false,
+      metadata: null,
     }
   }
 
   componentDidMount() {
-    var fileRef = firebase.storage().ref(this.props.file.storageRef)
+    const fileRef = firebaseStorage.ref(this.storage, this.props.file.storageRef)
 
-    fileRef.getMetadata().then((metadata) => {
+    firebaseStorage.getMetadata(fileRef).then((metadata) => {
+      this.setState({metadata})
       if (metadata.contentType.startsWith('image/')) {
         this.setState({isImage: true});
       } else {
@@ -95,18 +99,24 @@ class FileView extends React.Component {
       }
     })
 
-    fileRef.getDownloadURL()
-      .then(url =>
+    firebaseStorage.getDownloadURL(fileRef)
+      .then(url => {
         this.setState({imageUrl: url})
-      )
-      .catch(err =>
-        this.setState({imageUrl: null}))
+      })
+      .catch(err => {
+        console.error(err)
+        this.setState({imageUrl: null})
+      })
   }
 
-  onDelete() {
+  onDelete = () => {
     if (confirm("Are you sure you want to delete this file?")) {
       this.props.onDelete && this.props.onDelete()
     }
+  }
+
+  suggestedUrl = () => {
+    return 'test.bin';
   }
 
   render() {
@@ -116,16 +126,19 @@ class FileView extends React.Component {
         onClick={() => this.onDelete()}
         ></button>
     );
-    return this.state.imageUrl ? (
-      <span className="uploaded-image">
-        <a href={this.state.imageUrl} target="_blank">
+
+    if (this.state.imageUrl) {
+      return <span className="uploaded-image">
+        <a href={this.state.imageUrl} target="_blank" download={this.suggestedUrl()}>
           {this.state.isImage ? <img src={this.state.imageUrl} alt="Loading..." />
-        : <span className="view-button">View...</span>}
+          : <span className="view-button">View...</span>}
         </a>
         {deleteButton}
       </span>
-    ) :
-    (this.state.imageUrl === null) ? (<span>Error loading image. {deleteButton}</span>) :
-    (<span>Loading image...</span>)
+    } else if (this.state.imageUrl === null) {
+      return <span>Error loading image. {deleteButton}</span>
+    } else {
+      return <span>Loading image...</span>;
+    }
   }
 }

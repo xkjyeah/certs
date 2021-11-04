@@ -1,7 +1,8 @@
-import * as firebase from 'firebase';
+import * as firebaseAuth from 'firebase/auth';
+import * as firebaseDatabase from 'firebase/database';
 
-export function db(what) {
-  var userId = firebase.auth().currentUser.uid;
+export function db() {
+  var userId = firebaseAuth.getAuth().currentUser.uid;
 
-  return firebase.database().ref(`users/${userId}/`)
+  return firebaseDatabase.ref(firebaseDatabase.getDatabase(), `users/${userId}/`)
 }

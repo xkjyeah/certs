@@ -1,11 +1,10 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import events from './events';
-import firebase from 'firebase';
+import * as firebaseStorage from 'firebase/storage';
 
 export class Downloader extends React.Component {
   constructor(props, context) {
     super(props, context);
+    this.storage = firebaseStorage.getStorage()
     this.state = {
       url: ''
     }
@@ -14,7 +13,7 @@ export class Downloader extends React.Component {
   // }
   componentDidMount() {
     this._isMounted = true;
-    firebase.storage().ref(this.props.storageRef).getDownloadURL()
+    firebaseStorage.getDownloadURL(firebaseStorage.ref(this.storage, this.props.storageRef))
       .then(s => {
         if (this._isMounted) {
           this.setState({url: s})

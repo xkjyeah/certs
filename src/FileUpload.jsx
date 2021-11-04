@@ -1,8 +1,4 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as firebase from 'firebase';
-import assert from 'assert';
-import events from './events';
 import _ from 'lodash';
 
 export default class FileUpload extends React.Component {
@@ -14,7 +10,7 @@ export default class FileUpload extends React.Component {
     }
   }
 
-  handleUpload(event) {
+  handleUpload = (event) => {
     let filesAsArray = _(event.target.files).values().value();
     this.setState({files: filesAsArray})
     this.props.onChange(filesAsArray);
