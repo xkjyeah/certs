@@ -310,6 +310,8 @@ export class CertsForm extends React.Component {
                 <FileList key={this.state.shown} files={this.state.data.files}
                   onChange={this.filesChanged}
                   refreshFile={this.state.shown}
+                  employee={this.state.data.employee}
+                  certificate={this.state.data.certificate}
                   >
                 </FileList>
               </div>

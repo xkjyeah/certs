@@ -51,8 +51,11 @@ export default class FileList extends React.Component {
   render() {
     let fileViews = _(this.state.files)
       .values()
-      .map((f) => (
+      .map((f, index) => (
         <FileView key={f.key} file={f}
+          index={index + 1}
+          employee={this.props.employee}
+          certificate={this.props.certificate}
           onDelete={() => this.stageDelete(f)} />
       ))
       .sortBy('createdAt')
@@ -92,6 +95,7 @@ class FileView extends React.Component {
 
     firebaseStorage.getMetadata(fileRef).then((metadata) => {
       this.setState({metadata})
+      this.maybeUpdateMetadata(fileRef, metadata)
       if (metadata.contentType.startsWith('image/')) {
         this.setState({isImage: true});
       } else {
@@ -109,14 +113,43 @@ class FileView extends React.Component {
       })
   }
 
+  maybeUpdateMetadata = (ref, metadata) => {
+    const extensionFrom = (contentType) => {
+      switch (contentType) {
+        case 'application/pdf':
+          return '.pdf'
+        case 'image/png':
+          return '.png'
+        case 'image/gif':
+          return '.gif'
+        case 'image/jpeg':
+          return '.jpeg'
+        default:
+          return ''
+      }
+    }
+    /* When offering the file to download, we want to provide a nice name... */
+    const expectedFileName = `${this.props.employee}-${this.props.certificate}-${this.props.index}${extensionFrom(metadata.contentType)}`
+      .replace(/"/, '')
+
+    if ((metadata.contentDisposition || '').indexOf(expectedFileName) === -1) {
+      firebaseStorage.updateMetadata(ref, {
+        contentDisposition: `inline; filename="${expectedFileName}"`
+      })
+        .then((meta) => {
+          console.log('Updated metadata', meta)
+        })
+        .catch((err) => {
+          console.error(err)
+          throw err
+        })
+    }
+  }
+
   onDelete = () => {
     if (confirm("Are you sure you want to delete this file?")) {
       this.props.onDelete && this.props.onDelete()
     }
-  }
-
-  suggestedUrl = () => {
-    return 'test.bin';
   }
 
   render() {
@@ -129,7 +162,7 @@ class FileView extends React.Component {
 
     if (this.state.imageUrl) {
       return <span className="uploaded-image">
-        <a href={this.state.imageUrl} target="_blank" download={this.suggestedUrl()}>
+        <a href={this.state.imageUrl} target="_blank">
           {this.state.isImage ? <img src={this.state.imageUrl} alt="Loading..." />
           : <span className="view-button">View...</span>}
         </a>
