@@ -13,6 +13,7 @@ import FileList from './FileList.jsx';
 import classnames from 'classnames';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import { expectedFileName } from './util.js';
 
 export class CertsForm extends React.Component {
   constructor() {
@@ -35,19 +36,15 @@ export class CertsForm extends React.Component {
       shown: false
     }
   }
-  componentDidMount() {
-    this.requestEditListener = (certEntry) => {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.editingTarget !== this.props.editingTarget) {
       this.setState({
-        data: certEntry,
+        data: nextProps.editingTarget,
         newFiles: [],
         deletedFiles: [],
         shown: Date.now()
       })
-    };
-    events.on('requestEdit', this.requestEditListener);
-  }
-  componentWillUnmount() {
-    events.removeListener('requestEdit', this.requestEditListener);
+    }
   }
   validate = () => {
     let validationErrors = {
@@ -112,11 +109,18 @@ export class CertsForm extends React.Component {
 
     let fileUploadPromise = Promise.all(
       _.zip(this.state.newFiles, newFileKeys)
-      .map(([f, key]) => {
+      .map(([f, key], index) => {
         let now = Date.now();
         let storageRef = `certificates/${id}/files/${key}`;
 
-        return firebaseStorage.uploadBytes(firebaseStorage.ref(this.storage, storageRef), f)
+        return firebaseStorage.uploadBytes(firebaseStorage.ref(this.storage, storageRef), f, {
+          contentDisposition: `inline; filename="${expectedFileName({
+            employee: serialized.employee,
+            certificate: serialized.certificate,
+            index: this.state.data.files.length + index + 1,
+            mimeType: f.type,
+          })}"`
+        })
           .then(() => ({
             key,
             storageRef,
@@ -219,8 +223,8 @@ export class CertsForm extends React.Component {
       }
     }
 
-    if (!this.state.data) {
-      return
+    if (!this.state.data || !this.state.shown) {
+      return null;
     }
 
     return (

@@ -34,17 +34,14 @@ export class CertsPivot extends React.Component {
         return (<td key={`empty-${e}-${i}`} colSpan="2" className="empty"></td>)
       } else {
         let c = _.maxBy(cs, c => c.startDate)
-        let requestEdit = () => {
-          events.emit('requestEdit', c)
-        }
 
         return [
           <td key={c.id + '-issued'}
-            onClick={requestEdit}
+            onClick={() => this.props.requestEdit(c)}
             title={`${e}, ${i}`}
             className="issued">{c.startDate && c.startDate.format('DD MMM YYYY')}</td>,
           <td key={c.id + '-expires'}
-            onClick={requestEdit}
+            onClick={() => this.props.requestEdit(c)}
             title={`${e}, ${i}`}
             className="expires">{c.endDate && c.endDate.format('DD MMM YYYY')}</td>
         ]

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as firebaseStorage from 'firebase/storage';
 import FileUpload from './FileUpload.jsx';
+import { expectedFileName } from './util.js';
 
 export default class FileList extends React.Component {
   constructor(props, context) {
@@ -114,27 +115,17 @@ class FileView extends React.Component {
   }
 
   maybeUpdateMetadata = (ref, metadata) => {
-    const extensionFrom = (contentType) => {
-      switch (contentType) {
-        case 'application/pdf':
-          return '.pdf'
-        case 'image/png':
-          return '.png'
-        case 'image/gif':
-          return '.gif'
-        case 'image/jpeg':
-          return '.jpeg'
-        default:
-          return ''
-      }
-    }
     /* When offering the file to download, we want to provide a nice name... */
-    const expectedFileName = `${this.props.employee}-${this.props.certificate}-${this.props.index}${extensionFrom(metadata.contentType)}`
-      .replace(/"/, '')
+    const fileName = expectedFileName({
+      employee: this.props.employee,
+      certificate: this.props.certificate,
+      index: this.props.index,
+      mimeType: metadata.contentType,
+    })
 
-    if ((metadata.contentDisposition || '').indexOf(expectedFileName) === -1) {
+    if ((metadata.contentDisposition || '').indexOf(fileName) === -1) {
       firebaseStorage.updateMetadata(ref, {
-        contentDisposition: `inline; filename="${expectedFileName}"`
+        contentDisposition: `inline; filename="${fileName}"`
       })
         .then((meta) => {
           console.log('Updated metadata', meta)

@@ -3,8 +3,8 @@ import events from './events';
 import {Downloader} from './Downloader.jsx';
 
 export default class CertList extends React.Component {
-  constructor(props, context) {
-    super(props, context)
+  constructor() {
+    super()
     this.state = {
       shown: 20
     }
@@ -18,10 +18,6 @@ export default class CertList extends React.Component {
 
   render() {
     let certNodes = this.props.data.slice(0, this.state.shown).map(cert => {
-      var requestEdit = () => {
-        events.emit('requestEdit', cert)
-      }
-
       var startDateString = cert.startDate && cert.startDate.format('DD MMM YYYY');
       var endDateString = cert.endDate && cert.endDate.format('DD MMM YYYY');
 
@@ -50,7 +46,7 @@ export default class CertList extends React.Component {
               {endDateString}
             </div>
 
-            <button type="button" onClick={requestEdit}
+            <button type="button" onClick={() => this.props.requestEdit(cert)}
               className="glyphicon glyphicon-pencil btn btn-default btn-xs edit-button">
             </button>
           </div>

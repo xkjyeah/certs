@@ -6,11 +6,11 @@ import DatePicker from 'react-datepicker';
 import * as firebaseAuth from 'firebase/auth';
 import _ from 'lodash';
 import moment from 'moment';
-import events from './events';
+import { SingletonListsConsumer, SingletonListsProvider } from './events';
 
 moment.locale('en-GB')
 
-export class CertsUI extends React.Component {
+class CertsUIImpl extends React.Component {
   login = () => {
     const provider = new firebaseAuth.GoogleAuthProvider();
     firebaseAuth.signInWithRedirect(this.auth, provider)
@@ -19,8 +19,8 @@ export class CertsUI extends React.Component {
     this.auth.signOut();
   }
 
-  constructor(props, context) {
-    super(props, context);
+  constructor() {
+    super();
 
     this.auth = firebaseAuth.getAuth()
 
@@ -38,7 +38,9 @@ export class CertsUI extends React.Component {
       },
       auth: {user: null},
       certificates: [],
-      display: 'list'
+      display: 'list',
+
+      currentEditingTarget: null,
     }
 
     this.mountedPromise = new Promise((resolve) => {
@@ -54,11 +56,11 @@ export class CertsUI extends React.Component {
   }
 
   reload = () => {
-    events.emit('requestReload')
+    this.props.requestReload()
   }
 
   newCertificate = () => {
-    events.emit('requestEdit', {
+    this.requestEdit({
       employee: this.state.filter.employee,
       startDate: null,
       endDate: null,
@@ -68,18 +70,6 @@ export class CertsUI extends React.Component {
 
   componentDidMount() {
     this._mountedPromiseResolver();
-
-    this.onCertificatesLoaded = (certList) => {
-      this.setState({
-       certificates: certList,
-      })
-    };
-
-    events.on('certificatesLoaded', this.onCertificatesLoaded);
-  }
-
-  componentWillUnmount() {
-    events.removeListener('certificatesLoaded', this.onCertificatesLoaded);
   }
 
   updateFilter = (field, value) => {
@@ -131,9 +121,14 @@ export class CertsUI extends React.Component {
     )
   }
 
+  requestEdit = (certEntry) => {
+    this.setState({
+      currentEditingTarget: certEntry,
+    })
+  }
+
   render() {
-    let filteredCerts = this._filter(this.state.certificates);
-    let dashboardData = this._dashboardData(filteredCerts);
+    let filteredCerts = this._filter(this.props.certificates);
     let loginArea = this.state.auth.user ?
       (
         <div>
@@ -162,8 +157,8 @@ export class CertsUI extends React.Component {
       </div>);
 
     let display = this.state.display === 'list' ?
-      (<CertsTable certs={filteredCerts}></CertsTable>) :
-      (<CertsPivot certs={filteredCerts}></CertsPivot>)
+      (<CertsTable requestEdit={this.requestEdit} certs={filteredCerts}></CertsTable>) :
+      (<CertsPivot requestEdit={this.requestEdit} certs={filteredCerts}></CertsPivot>)
 
     return (
       <main>
@@ -246,9 +241,22 @@ export class CertsUI extends React.Component {
           </button>
         </div>
         {display}
-        <CertsForm onSave={this.reload.bind(this)}></CertsForm>
+        <CertsForm
+          onSave={this.reload}
+          editingTarget={this.state.currentEditingTarget}
+          ></CertsForm>
       </main>
     )
+  }
+}
+
+export class CertsUI extends React.Component {
+  render() {
+    return <SingletonListsProvider>
+        <SingletonListsConsumer source="certificateList">
+        {({data, requestReload}) => <CertsUIImpl certificates={data} requestReload={requestReload} />}
+      </SingletonListsConsumer>
+    </SingletonListsProvider>
   }
 }
 

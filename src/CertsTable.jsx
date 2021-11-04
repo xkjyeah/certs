@@ -28,10 +28,6 @@ export class CertsTable extends React.Component {
         [this.state.orderByType ? 'asc' : 'desc']
       )
       .map((row, id) => {
-        let requestEdit = () => {
-          events.emit('requestEdit', row)
-        }
-
         let attachments = row.files.map(x =>
               (<Downloader key={x.storageRef}
                 storageRef={x.storageRef} />))
@@ -39,7 +35,7 @@ export class CertsTable extends React.Component {
         return (
           <tr key={id}>
             <td>
-              <button type="button" onClick={requestEdit}
+              <button type="button" onClick={() => this.props.requestEdit(row)}
                 className="glyphicon glyphicon-pencil btn btn-default btn-xs edit-button">
               </button>
             </td>
