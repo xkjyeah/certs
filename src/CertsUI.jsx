@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {CertsForm} from './CertsForm.jsx';
-import {CertsTable} from './CertsTable.jsx';
-import {CertsPivot} from './CertsPivot.jsx';
+import { CertsForm } from './CertsForm.jsx';
+import { CertsTable } from './CertsTable.jsx';
+import { CertsPivot } from './CertsPivot.jsx';
 import DatePicker from 'react-datepicker';
 import * as firebaseAuth from 'firebase/auth';
 import _ from 'lodash';
@@ -13,7 +13,7 @@ moment.locale('en-GB')
 class CertsUIImpl extends React.Component {
   login = () => {
     const provider = new firebaseAuth.GoogleAuthProvider();
-    firebaseAuth.signInWithRedirect(this.auth, provider)
+    firebaseAuth.signInWithPopup(this.auth, provider)
   }
   logout = () => {
     this.auth.signOut();
@@ -36,7 +36,7 @@ class CertsUIImpl extends React.Component {
         valid: true,
         referenceDate: moment()
       },
-      auth: {user: null},
+      auth: { user: null },
       certificates: [],
       display: 'list',
 
@@ -49,7 +49,7 @@ class CertsUIImpl extends React.Component {
 
     firebaseAuth.onAuthStateChanged(this.auth, (user) => {
       this.mountedPromise.then(() => {
-        this.setState({auth: {user}})
+        this.setState({ auth: { user } })
         this.reload();
       })
     });
@@ -84,7 +84,7 @@ class CertsUIImpl extends React.Component {
     let now = Date.now();
     return {
       recentlyExpired: _(certList)
-      /* show even those with invalid date entries */
+        /* show even those with invalid date entries */
         .filter(c => !c.endDate || c.endDate.valueOf() < now)
         .sortBy(c => !c.endDate || -c.endDate.valueOf())
         .value(),
@@ -93,8 +93,8 @@ class CertsUIImpl extends React.Component {
         .sortBy(c => c.endDate && c.endDate.valueOf())
         .value().concat(
           _(certList)
-          .filter(c => !c.endDate)
-          .value()
+            .filter(c => !c.endDate)
+            .value()
         ),
       recent: _(certList)
         .filter(c => c.startDate && isFinite(c.startDate.valueOf()))
@@ -147,7 +147,7 @@ class CertsUIImpl extends React.Component {
           </button>;
         </div>
       )
-         :
+      :
       (<div>
         <button onClick={this.login}
           className="btn btn-default">
@@ -167,37 +167,37 @@ class CertsUIImpl extends React.Component {
         <div className="filter-area">
           <label>
             <input
-                className="form-control"
-                value={this.state.filter.employee}
-                onChange={debounced((e) => this.updateFilter('employee', e.target.value))}
-                placeholder="Search by Employee name..."
-                type="text"
-                />
+              className="form-control"
+              value={this.state.filter.employee}
+              onChange={debounced((e) => this.updateFilter('employee', e.target.value))}
+              placeholder="Search by Employee name..."
+              type="text"
+            />
           </label>
           <label className="certificates-filter">
             <input
               className="form-control"
-                value={this.state.filter.certificate}
-                onChange={debounced((e) => this.updateFilter('certificate', e.target.value))}
-                placeholder="Search by Certificate..."
-                type="text"
-                />
+              value={this.state.filter.certificate}
+              onChange={debounced((e) => this.updateFilter('certificate', e.target.value))}
+              placeholder="Search by Certificate..."
+              type="text"
+            />
           </label>
           <label className="certificates-filter">
             <input
-                checked={this.state.filter.valid}
-                onChange={(e) => this.updateFilter('valid', e.target.checked)}
-                type="checkbox"
-                />
-              Valid on
+              checked={this.state.filter.valid}
+              onChange={(e) => this.updateFilter('valid', e.target.checked)}
+              type="checkbox"
+            />
+            Valid on
           </label>
           <label className="certificates-filter">
             <input
-                checked={this.state.filter.expired}
-                onChange={(e) => this.updateFilter('expired', e.target.checked)}
-                type="checkbox"
-                />
-              Expired on
+              checked={this.state.filter.expired}
+              onChange={(e) => this.updateFilter('expired', e.target.checked)}
+              type="checkbox"
+            />
+            Expired on
           </label>
           |
 
@@ -206,36 +206,36 @@ class CertsUIImpl extends React.Component {
             <DatePicker
               selected={this.state.filter.referenceDate}
               onChange={e => this.updateFilter('referenceDate', e)}
-              />
+            />
           </label>
           |
 
           <label className="certificates-filter">
             <input
-                checked={this.state.display === 'list'}
-                onChange={(e) => this.setState({display: e.currentTarget.value})}
-                value="list"
-                type="radio"
-                name="display-type"
-                />
-              Show list
+              checked={this.state.display === 'list'}
+              onChange={(e) => this.setState({ display: e.currentTarget.value })}
+              value="list"
+              type="radio"
+              name="display-type"
+            />
+            Show list
           </label>
 
           <label className="certificates-filter">
             <input
-                checked={this.state.display === 'pivot'}
-                onChange={(e) => this.setState({display: e.currentTarget.value})}
-                value="pivot"
-                type="radio"
-                name="display-type"
-                />
-              Show summary
+              checked={this.state.display === 'pivot'}
+              onChange={(e) => this.setState({ display: e.currentTarget.value })}
+              value="pivot"
+              type="radio"
+              name="display-type"
+            />
+            Show summary
           </label>
           |
 
           <button type="button" onClick={this.newCertificate.bind(this)}
             className="btn btn-primary"
-            >
+          >
             <i className=" glyphicon glyphicon-plus"></i>
             Add certificate
           </button>
@@ -244,7 +244,7 @@ class CertsUIImpl extends React.Component {
         <CertsForm
           onSave={this.reload}
           editingTarget={this.state.currentEditingTarget}
-          ></CertsForm>
+        ></CertsForm>
       </main>
     )
   }
@@ -253,8 +253,8 @@ class CertsUIImpl extends React.Component {
 export class CertsUI extends React.Component {
   render() {
     return <SingletonListsProvider>
-        <SingletonListsConsumer source="certificateList">
-        {({data, requestReload}) => <CertsUIImpl certificates={data} requestReload={requestReload} />}
+      <SingletonListsConsumer source="certificateList">
+        {({ data, requestReload }) => <CertsUIImpl certificates={data} requestReload={requestReload} />}
       </SingletonListsConsumer>
     </SingletonListsProvider>
   }
